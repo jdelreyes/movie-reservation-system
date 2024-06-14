@@ -18,7 +18,8 @@ public class MovieSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime schedule;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     @ManyToOne
     private Movie movie;
     @ManyToOne

@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  postgresql-movie-reservation-system:
+    container_name: postgresql-movie-reservation-system
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: movie-reservation-system
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:8.3
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.ca
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "80:80"
+    restart: unless-stopped

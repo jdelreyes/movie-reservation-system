@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,6 +23,7 @@ public class Movie {
     private Long id;
     private String title;
     private String description;
+    private String director;
     @Enumerated(EnumType.STRING)
     private Genre genre;
 }

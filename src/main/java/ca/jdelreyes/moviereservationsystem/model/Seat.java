@@ -17,6 +17,8 @@ public class Seat {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    private MovieSchedule movieSchedule;
-    private boolean isTaken;
+    private Theater theater;
+    private Character rowLetter;
+    private Integer seatNumber;
+    private Boolean isReserved;
 }
