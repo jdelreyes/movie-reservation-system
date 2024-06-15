@@ -1,4 +1,5 @@
 src/main/resources/application.properties
+src/main/resources/application-docker.properties
 
 HELP.md
 .gradle
