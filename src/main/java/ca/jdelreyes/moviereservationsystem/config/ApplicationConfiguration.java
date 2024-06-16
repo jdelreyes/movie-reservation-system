@@ -1,5 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.config;
 
+import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,7 @@ public class ApplicationConfiguration {
         return username ->
                 userRepository
                         .findUserByUsername(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                        .orElseThrow(() -> new UsernameNotFoundException("Not Found"));
     }
 
     @Bean

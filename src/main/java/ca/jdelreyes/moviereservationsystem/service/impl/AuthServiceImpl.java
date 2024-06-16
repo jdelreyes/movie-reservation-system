@@ -34,7 +34,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    @Transactional
     public AuthResponse register(AuthRequest authRequest) {
         User user = User.builder()
                 .username(authRequest.username())

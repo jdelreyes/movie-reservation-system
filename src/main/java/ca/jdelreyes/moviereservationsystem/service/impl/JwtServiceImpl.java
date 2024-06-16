@@ -30,12 +30,14 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        final Date ONE_DAY = new Date(System.currentTimeMillis() + 1000 * 60 * 24);
+
         return Jwts
                 .builder()
                 .claims(extraClaims)
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
+                .expiration(ONE_DAY)
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
@@ -47,7 +49,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username=extractUsername(token);
+        final String username = extractUsername(token);
 
         return (Objects.equals(username, userDetails.getUsername()) && !isTokenExpired(token));
     }
