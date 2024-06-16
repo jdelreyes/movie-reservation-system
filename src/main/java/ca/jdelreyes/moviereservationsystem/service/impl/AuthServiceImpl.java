@@ -2,15 +2,14 @@ package ca.jdelreyes.moviereservationsystem.service.impl;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.model.User;
 import ca.jdelreyes.moviereservationsystem.model.enums.Role;
 import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
 import ca.jdelreyes.moviereservationsystem.service.AuthService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -25,12 +24,14 @@ public class AuthServiceImpl implements AuthService {
     public AuthResponse authenticate(AuthRequest authRequest) {
         User user = userRepository
                 .findUserByUsername(authRequest.username())
-                .orElseThrow(() -> new UsernameNotFoundException(""));
+                .orElseThrow(NotFoundException::new);
 
-//        if (!passwordMatches(authRequest.password(), user.getPassword()))
-//        todo: create exception
+        if (!passwordMatches(authRequest.password(), user.getPassword()))
+            throw new NotFoundException();
 
-        return null;
+        String token = jwtService.generateToken(user);
+
+        return new AuthResponse(token);
     }
 
     @Override
