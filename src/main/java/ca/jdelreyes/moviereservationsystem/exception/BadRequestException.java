@@ -1,6 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.exception;
 
-public class BadRequestException extends RuntimeException {
+public class BadRequestException extends Exception {
     public BadRequestException() {
         super("Bad Request");
     }

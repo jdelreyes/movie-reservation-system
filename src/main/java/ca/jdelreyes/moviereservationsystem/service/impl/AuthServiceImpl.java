@@ -21,7 +21,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public AuthResponse authenticate(AuthRequest authRequest) {
+    public AuthResponse authenticate(AuthRequest authRequest) throws NotFoundException {
         User user = userRepository
                 .findUserByUsername(authRequest.username())
                 .orElseThrow(NotFoundException::new);

@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional()
+@Transactional
 public class AuthClientTests {
     @Autowired
     private TestRestTemplate restTemplate;

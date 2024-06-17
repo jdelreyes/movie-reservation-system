@@ -1,6 +1,7 @@
 package ca.jdelreyes.moviereservationsystem.exception.handler;
 
 import ca.jdelreyes.moviereservationsystem.exception.BadRequestException;
+import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -25,6 +26,14 @@ public class ApplicationExceptionHandler {
     public Map<String, Object> handleBadRequestException(BadRequestException badRequestException) {
         Map<String, Object> errorMap = new HashMap<>();
         errorMap.put("message", badRequestException.getMessage());
+        return errorMap;
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Map<String, Object> handleForbiddenException(ForbiddenException forbiddenException) {
+        Map<String, Object> errorMap = new HashMap<>();
+        errorMap.put("message", forbiddenException.getMessage());
         return errorMap;
     }
 }

@@ -1,6 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.config;
 
-import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
+import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -10,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,9 +21,15 @@ public class ApplicationConfiguration {
     @Bean
     public UserDetailsService userDetailsService() {
         return username ->
-                userRepository
+        {
+            try {
+                return userRepository
                         .findUserByUsername(username)
-                        .orElseThrow(() -> new UsernameNotFoundException("Not Found"));
+                        .orElseThrow(ForbiddenException::new);
+            } catch (ForbiddenException e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     @Bean

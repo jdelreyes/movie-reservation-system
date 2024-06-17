@@ -2,10 +2,10 @@ package ca.jdelreyes.moviereservationsystem.controller;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.service.impl.AuthServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +19,7 @@ public class AuthController {
     private final AuthServiceImpl authService;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> authenticate(@Valid @RequestBody AuthRequest authRequest) throws NotFoundException {
         return ResponseEntity.ok(authService.authenticate(authRequest));
     }
 
