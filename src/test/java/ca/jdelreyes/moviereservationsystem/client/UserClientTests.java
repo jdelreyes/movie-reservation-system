@@ -2,6 +2,7 @@ package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.dto.user.UpdateOwnProfileRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,19 @@ public class UserClientTests {
         assertThat(listResponseEntity).isNotNull();
         assertThat(listResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(listResponseEntity.getBody().size()).isEqualTo(1);
+    }
+
+    @Test
+    public void get_users_without_token_should_return_403() {
+        ResponseEntity<List<UserResponse>> listResponseEntity = restTemplate.exchange(
+                "/api/users",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<UserResponse>>() {
+                }
+        );
+
+        assertThat(listResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
@@ -80,9 +94,13 @@ public class UserClientTests {
         assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
-    public String getToken() {
+    private String getToken() {
         return restTemplate.postForObject("/api/auth/register",
                 new AuthRequest("username", "password"),
                 AuthResponse.class).token();
+    }
+
+    private UpdateOwnProfileRequest updateProfileRequest() {
+        return new UpdateOwnProfileRequest("updatedUsername");
     }
 }
