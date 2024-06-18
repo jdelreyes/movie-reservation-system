@@ -41,14 +41,14 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize(value = "hasRole('ADMIN')")
+    @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<UserResponse> updateUser(@PathVariable("id") Long id,
                                                    @Valid @RequestBody UpdateUserRequest updateUserRequest) throws NotFoundException {
         return ResponseEntity.ok(userService.updateUser(id, updateUserRequest));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize(value = "hasRole('ADMIN')")
+    @PreAuthorize(value = "hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) throws NotFoundException {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

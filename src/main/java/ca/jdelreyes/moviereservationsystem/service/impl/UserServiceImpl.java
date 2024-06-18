@@ -12,7 +12,6 @@ import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
 import ca.jdelreyes.moviereservationsystem.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getUsers(PageRequest pageRequest) {
-        return userRepository.findAll().stream().map(Mapper::mapUserToUserResponse).toList();
+        return userRepository.findAll(pageRequest).stream().map(Mapper::mapUserToUserResponse).toList();
     }
 
     @Override
@@ -46,7 +45,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse updateOwnProfile(String username,
                                          UpdateOwnProfileRequest updateOwnProfileRequest) throws NotFoundException {
-        User user = userRepository.findUserByUsername(username).orElseThrow(NotFoundException::new);
+        User user = userRepository.findByUsername(username).orElseThrow(NotFoundException::new);
         user.setUsername(updateOwnProfileRequest.username());
 
         userRepository.save(user);
@@ -57,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateOwnPassword(String username,
                                   UpdateOwnPasswordRequest updateOwnPasswordRequest) throws NotFoundException, BadRequestException {
-        User user = userRepository.findUserByUsername(username).orElseThrow(NotFoundException::new);
+        User user = userRepository.findByUsername(username).orElseThrow(NotFoundException::new);
 
         if (!passwordEncoder.matches(updateOwnPasswordRequest.oldPassword(), user.getPassword()))
             throw new BadRequestException();
@@ -69,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteOwnAccount(String username) throws NotFoundException {
-        User user = userRepository.findUserByUsername(username).orElseThrow(NotFoundException::new);
+        User user = userRepository.findByUsername(username).orElseThrow(NotFoundException::new);
 
         // remove user from security context, basically log out
         SecurityContextHolder.getContext().setAuthentication(null);

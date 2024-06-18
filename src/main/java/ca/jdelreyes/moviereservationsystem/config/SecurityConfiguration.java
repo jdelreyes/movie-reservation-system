@@ -28,15 +28,17 @@ public class SecurityConfiguration {
         httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry ->
-                        authorizationManagerRequestMatcherRegistry
-                                .requestMatchers("/api/auth/**")
-                                .permitAll()
-                                .requestMatchers(HttpMethod.GET, "/api/movies/**")
-                                .hasRole(Role.USER.name())
-                                .requestMatchers("/api/movies/**")
-                                .hasRole(Role.ADMIN.name())
-                                .anyRequest()
-                                .authenticated()
+                                authorizationManagerRequestMatcherRegistry
+                                        .requestMatchers("/api/auth/**")
+                                        .permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/api/movies/**")
+                                        .permitAll()
+                                        .requestMatchers("/api/movies/**")
+                                        .hasRole(Role.ADMIN.name())
+                                        .anyRequest()
+                                        .authenticated()
+//                                .anyRequest()
+//                                .permitAll()
                 )
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

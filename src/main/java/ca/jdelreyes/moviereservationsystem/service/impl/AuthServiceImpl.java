@@ -23,7 +23,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse authenticate(AuthRequest authRequest) throws NotFoundException {
         User user = userRepository
-                .findUserByUsername(authRequest.username())
+                .findByUsername(authRequest.username())
                 .orElseThrow(NotFoundException::new);
 
         if (!passwordMatches(authRequest.password(), user.getPassword()))

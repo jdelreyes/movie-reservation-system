@@ -24,7 +24,7 @@ public class ApplicationConfiguration {
         {
             try {
                 return userRepository
-                        .findUserByUsername(username)
+                        .findByUsername(username)
                         .orElseThrow(ForbiddenException::new);
             } catch (ForbiddenException e) {
                 throw new RuntimeException(e);
