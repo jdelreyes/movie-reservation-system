@@ -2,7 +2,9 @@ package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.dto.user.UpdateOwnPasswordRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UpdateOwnProfileRequest;
+import ca.jdelreyes.moviereservationsystem.dto.user.UpdateUserRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,13 +96,149 @@ public class UserClientTests {
         assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
+    @Test
+    public void update_own_profile_should_return_200() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
+                "/api/users/update-profile",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateOwnProfileRequest(), headers),
+                UserResponse.class
+        );
+
+        assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(userResponseResponseEntity.getBody().username()).isEqualTo(updateOwnProfileRequest().username());
+    }
+
+    @Test
+    public void update_own_profile_without_body_should_return_422() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
+                "/api/users/update-profile",
+                HttpMethod.PUT,
+                new HttpEntity<>(headers),
+                UserResponse.class
+        );
+
+        assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+
+    @Test
+    public void update_own_password_should_return_204() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
+                "/api/users/update-password",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateOwnPasswordRequest(), headers),
+                Void.class
+        );
+
+        assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void update_own_password_with_wrong_old_password_should_return_400() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
+                "/api/users/update-password",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateOwnWrongPasswordRequest(), headers),
+                Void.class
+        );
+
+        assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void delete_own_account_should_return_204() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
+                "/api/users/delete-account",
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class
+        );
+
+        assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void delete_own_account_without_token_should_return_404() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
+                "/api/users/delete-account",
+                HttpMethod.DELETE,
+                null,
+                Void.class
+        );
+
+        assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    // todo: write 2 tests for updating and deleting a user using an admin account
+
+    @Test
+    public void update_user_without_admin_role_should_give_403() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
+                "/api/users/1",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateUserRequest(), headers),
+                UserResponse.class
+        );
+
+        assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void delete_user_without_admin_role_should_give_403() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getToken());
+
+        ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
+                "/api/users/1",
+                HttpMethod.DELETE,
+                null,
+                Void.class
+        );
+
+
+        assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
     private String getToken() {
         return restTemplate.postForObject("/api/auth/register",
                 new AuthRequest("username", "password"),
                 AuthResponse.class).token();
     }
 
-    private UpdateOwnProfileRequest updateProfileRequest() {
+    private UpdateOwnProfileRequest updateOwnProfileRequest() {
         return new UpdateOwnProfileRequest("updatedUsername");
+    }
+
+    private UpdateOwnPasswordRequest updateOwnPasswordRequest() {
+        return new UpdateOwnPasswordRequest("password", "updatedPassword");
+    }
+
+    private UpdateOwnPasswordRequest updateOwnWrongPasswordRequest() {
+        return new UpdateOwnPasswordRequest("wrongPassword", "updatedPassword");
+    }
+
+    private UpdateUserRequest updateUserRequest() {
+        return new UpdateUserRequest("updateUsername");
     }
 }

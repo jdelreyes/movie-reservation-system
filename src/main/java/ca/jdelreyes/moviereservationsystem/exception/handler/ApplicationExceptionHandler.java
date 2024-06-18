@@ -5,7 +5,6 @@ import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -54,14 +53,6 @@ public class ApplicationExceptionHandler {
     public Map<String, Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException methodArgumentNotValidException) {
         Map<String, Object> errorMap = new HashMap<>();
         errorMap.put("message", methodArgumentNotValidException.getBody().getDetail());
-        return errorMap;
-    }
-
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    public Map<String, Object> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException httpMediaTypeNotSupportedException) {
-        Map<String, Object> errorMap = new HashMap<>();
-        errorMap.put("message", httpMediaTypeNotSupportedException.getMessage());
         return errorMap;
     }
 }
