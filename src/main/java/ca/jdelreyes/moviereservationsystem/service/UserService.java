@@ -6,11 +6,14 @@ import ca.jdelreyes.moviereservationsystem.dto.user.UpdateUserRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import ca.jdelreyes.moviereservationsystem.exception.BadRequestException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import java.awt.*;
 import java.util.List;
 
 public interface UserService {
-    public List<UserResponse> getUsers();
+    public List<UserResponse> getUsers(PageRequest pageRequest);
 
     public UserResponse getUser(Long id) throws NotFoundException;
 

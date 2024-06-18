@@ -10,6 +10,9 @@ import ca.jdelreyes.moviereservationsystem.model.User;
 import ca.jdelreyes.moviereservationsystem.service.impl.UserServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,8 +27,12 @@ public class UserController {
     private final UserServiceImpl userService;
 
     @GetMapping
-    public ResponseEntity<List<UserResponse>> getUsers() {
-        return ResponseEntity.ok(userService.getUsers());
+    public ResponseEntity<List<UserResponse>> getUsers(Pageable pageable) {
+        return ResponseEntity.ok(userService.getUsers(PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                pageable.getSortOr(Sort.by(Sort.Direction.ASC, "username"))
+        )));
     }
 
     @GetMapping("/{id}")
