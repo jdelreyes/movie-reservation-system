@@ -20,5 +20,5 @@ public class Theater {
     private Long id;
     private String name;
     private String location;
-    private int capacity;
+    private Integer capacity;
 }
