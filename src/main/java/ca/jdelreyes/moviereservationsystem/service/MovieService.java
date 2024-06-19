@@ -15,7 +15,7 @@ public interface MovieService {
 
     public MovieResponse createMovie(CreateMovieRequest createMovieRequest);
 
-    public MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest);//todo
+    public MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) throws NotFoundException;//todo
 
-    public void deleteMovie(Long id);
+    public void deleteMovie(Long id) throws NotFoundException;
 }

@@ -14,6 +14,6 @@ public class Mapper {
     }
 
     public static MovieResponse mapMovieToMovieResponse(Movie movie) {
-        return new MovieResponse(movie.getTitle(), movie.getDescription(), movie.getDirector(), movie.getGenre());
+        return new MovieResponse(movie.getId(), movie.getTitle(), movie.getDescription(), movie.getDirector(), movie.getGenre());
     }
 }

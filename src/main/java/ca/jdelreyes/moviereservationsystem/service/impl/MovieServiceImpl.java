@@ -46,12 +46,29 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) {
-        return null; //todo
+    public MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) throws NotFoundException {
+        Movie movie = movieRepository.findById(id).orElseThrow(NotFoundException::new);
+        movie = setMovie(movie.getId(), updateMovieRequest);
+
+        movieRepository.save(movie);
+
+        return Mapper.mapMovieToMovieResponse(movie);
     }
 
     @Override
-    public void deleteMovie(Long id) {
+    public void deleteMovie(Long id) throws NotFoundException {
+        Movie movie = movieRepository.findById(id).orElseThrow(NotFoundException::new);
 
+        movieRepository.delete(movie);
+    }
+
+    private Movie setMovie(Long id, UpdateMovieRequest updateMovieRequest) {
+        return Movie.builder()
+                .id(id)
+                .title(updateMovieRequest.title())
+                .description(updateMovieRequest.description())
+                .director(updateMovieRequest.director())
+                .genre(updateMovieRequest.genre())
+                .build();
     }
 }
