@@ -1,14 +1,12 @@
 package ca.jdelreyes.moviereservationsystem.helper;
 
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
-import ca.jdelreyes.moviereservationsystem.model.Movie;
-import ca.jdelreyes.moviereservationsystem.model.Seat;
-import ca.jdelreyes.moviereservationsystem.model.Theater;
-import ca.jdelreyes.moviereservationsystem.model.User;
+import ca.jdelreyes.moviereservationsystem.model.*;
 
 import java.util.List;
 
@@ -37,8 +35,7 @@ public class Mapper {
         return new TheaterResponse(
                 theater.getId(),
                 theater.getName(),
-                theater.getLocation(),
-                theater.getCapacity()
+                theater.getLocation()
         );
     }
 
@@ -47,7 +44,6 @@ public class Mapper {
                 theater.getId(),
                 theater.getName(),
                 theater.getLocation(),
-                theater.getCapacity(),
                 seatList.stream().map(Mapper::mapSeatToSeatResponse).toList()
         );
     }
@@ -58,6 +54,16 @@ public class Mapper {
                 seat.getRowLetter(),
                 seat.getSeatNumber(),
                 seat.getIsReserved()
+        );
+    }
+
+    public static MovieScheduleResponse mapMovieScheduleToMovieScheduleResponse(MovieSchedule movieSchedule) {
+        return new MovieScheduleResponse(
+                movieSchedule.getId(),
+                movieSchedule.getStartTime(),
+                movieSchedule.getEndTime(),
+                movieSchedule.getMovie(),
+                movieSchedule.getTheater()
         );
     }
 }

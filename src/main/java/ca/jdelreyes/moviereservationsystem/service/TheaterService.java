@@ -1,6 +1,8 @@
 package ca.jdelreyes.moviereservationsystem.service;
 
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieScheduleRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.CreateTheaterRequest;
@@ -16,21 +18,21 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 public interface TheaterService {
-    public MovieScheduleResponse airMovie(Theater theater, Movie movie);
+    MovieScheduleResponse airMovie(CreateMovieScheduleRequest createMovieScheduleRequest) throws NotFoundException;
 
-    public MovieScheduleResponse cancelMovie(MovieSchedule movieSchedule);
+    MovieScheduleResponse cancelMovie(Long movieScheduleId) throws NotFoundException;
 
-    public MovieScheduleResponse rescheduleMovie(MovieSchedule movieSchedule);
+    MovieScheduleResponse rescheduleMovie(RescheduleMovieRequest rescheduleMovieRequest) throws NotFoundException;
 
-    public List<TheaterResponse> getTheaters(PageRequest pageRequest);
+    List<TheaterResponse> getTheaters(PageRequest pageRequest);
 
-    public TheaterDetailsResponse getTheater(Long id) throws NotFoundException;
+    TheaterDetailsResponse getTheater(Long id) throws NotFoundException;
 
-    public TheaterDetailsResponse createTheater(CreateTheaterRequest createTheaterRequest,
+    TheaterDetailsResponse createTheater(CreateTheaterRequest createTheaterRequest,
                                          List<CreateSeatRequest> createSeatRequestList);
 
-    public TheaterDetailsResponse updateTheater(Long id, UpdateTheaterRequest updateTheaterRequest,
+    TheaterDetailsResponse updateTheater(Long id, UpdateTheaterRequest updateTheaterRequest,
                                          List<UpdateSeatRequest> updateSeatRequestList) throws NotFoundException;
 
-    public void deleteTheater(Long id) throws NotFoundException;
+    void deleteTheater(Long id) throws NotFoundException;
 }

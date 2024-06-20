@@ -9,13 +9,13 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 public interface MovieService {
-    public List<MovieResponse> getMovies(PageRequest pageRequest);
+    List<MovieResponse> getMovies(PageRequest pageRequest);
 
-    public MovieResponse getMovie(Long id) throws NotFoundException;
+    MovieResponse getMovie(Long id) throws NotFoundException;
 
-    public MovieResponse createMovie(CreateMovieRequest createMovieRequest);
+    MovieResponse createMovie(CreateMovieRequest createMovieRequest);
 
-    public MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) throws NotFoundException;//todo
+    MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) throws NotFoundException;
 
-    public void deleteMovie(Long id) throws NotFoundException;
+    void deleteMovie(Long id) throws NotFoundException;
 }

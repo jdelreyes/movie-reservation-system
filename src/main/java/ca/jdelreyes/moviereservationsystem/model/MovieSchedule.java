@@ -20,6 +20,7 @@ public class MovieSchedule {
     private Long id;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private Boolean isCancelled;
     @ManyToOne
     private Movie movie;
     @ManyToOne

@@ -7,6 +7,5 @@ import java.util.List;
 public record TheaterDetailsResponse(Long id,
                                      String name,
                                      String location,
-                                     Integer capacity,
                                      List<SeatResponse> seatResponseList) {
 }

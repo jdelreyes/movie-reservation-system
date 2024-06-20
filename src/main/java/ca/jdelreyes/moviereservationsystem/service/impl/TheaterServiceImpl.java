@@ -1,6 +1,8 @@
 package ca.jdelreyes.moviereservationsystem.service.impl;
 
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieScheduleRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.CreateTheaterRequest;
@@ -13,6 +15,8 @@ import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.model.MovieSchedule;
 import ca.jdelreyes.moviereservationsystem.model.Seat;
 import ca.jdelreyes.moviereservationsystem.model.Theater;
+import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
+import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
 import ca.jdelreyes.moviereservationsystem.repository.SeatRepository;
 import ca.jdelreyes.moviereservationsystem.repository.TheaterRepository;
 import ca.jdelreyes.moviereservationsystem.service.TheaterService;
@@ -27,20 +31,54 @@ import java.util.List;
 public class TheaterServiceImpl implements TheaterService {
     private final TheaterRepository theaterRepository;
     private final SeatRepository seatRepository;
+    private final MovieScheduleRepository movieScheduleRepository;
+    private final MovieRepository movieRepository;
 
     @Override
-    public MovieScheduleResponse airMovie(Theater theater, Movie movie) {
-        return null;
+    public MovieScheduleResponse airMovie(CreateMovieScheduleRequest createMovieScheduleRequest) throws NotFoundException {
+        Theater theater =
+                theaterRepository.findById(createMovieScheduleRequest.theaterId()).orElseThrow(NotFoundException::new);
+        Movie movie =
+                movieRepository.findById(createMovieScheduleRequest.movieId()).orElseThrow(NotFoundException::new);
+
+        MovieSchedule movieSchedule = MovieSchedule.builder()
+                .startTime(createMovieScheduleRequest.startTime())
+                .endTime(createMovieScheduleRequest.endTime())
+                .movie(movie)
+                .isCancelled(false)
+                .theater(theater)
+                .build();
+
+        movieScheduleRepository.save(movieSchedule);
+
+        return Mapper.mapMovieScheduleToMovieScheduleResponse(movieSchedule);
     }
 
     @Override
-    public MovieScheduleResponse cancelMovie(MovieSchedule movieSchedule) {
-        return null;
+    public MovieScheduleResponse cancelMovie(Long movieScheduleId) throws NotFoundException {
+        MovieSchedule movieSchedule = movieScheduleRepository
+                .findById(movieScheduleId)
+                .orElseThrow(NotFoundException::new);
+
+        movieSchedule.setIsCancelled(true);
+
+        movieScheduleRepository.save(movieSchedule);
+
+        return Mapper.mapMovieScheduleToMovieScheduleResponse(movieSchedule);
     }
 
     @Override
-    public MovieScheduleResponse rescheduleMovie(MovieSchedule movieSchedule) {
-        return null;
+    public MovieScheduleResponse rescheduleMovie(RescheduleMovieRequest rescheduleMovieRequest) throws NotFoundException {
+        MovieSchedule movieSchedule = movieScheduleRepository
+                .findById(rescheduleMovieRequest.movieScheduleId())
+                .orElseThrow(NotFoundException::new);
+
+        movieSchedule.setStartTime(rescheduleMovieRequest.startTime());
+        movieSchedule.setEndTime(rescheduleMovieRequest.endTime());
+
+        movieScheduleRepository.save(movieSchedule);
+
+        return Mapper.mapMovieScheduleToMovieScheduleResponse(movieSchedule);
     }
 
     @Override
@@ -61,7 +99,6 @@ public class TheaterServiceImpl implements TheaterService {
         Theater theater = Theater.builder()
                 .name(createTheaterRequest.name())
                 .location(createTheaterRequest.location())
-                .capacity(createTheaterRequest.capacity())
                 .build();
 
         theaterRepository.save(theater);
@@ -80,7 +117,7 @@ public class TheaterServiceImpl implements TheaterService {
         return Mapper.mapTheaterToTheaterDetailsResponse(theater, seatList);
     }
 
-//    fixme: updating a theater with the seats could lead to seats being reduced or added.
+    //    fixme: updating a theater with the seats could lead to seats being reduced or added.
 //           should i separate the theater creation/update and seats creation/update?
     @Override
     public TheaterDetailsResponse updateTheater(Long id,
@@ -88,7 +125,6 @@ public class TheaterServiceImpl implements TheaterService {
                                                 List<UpdateSeatRequest> updateSeatRequestList) throws NotFoundException {
         Theater theater = theaterRepository.findById(id).orElseThrow(NotFoundException::new);
         theater = setTheater(theater, updateTheaterRequest);
-
 
 
         return null;
@@ -104,7 +140,6 @@ public class TheaterServiceImpl implements TheaterService {
     private Theater setTheater(Theater theater, UpdateTheaterRequest updateTheaterRequest) {
         theater.setName(updateTheaterRequest.name());
         theater.setLocation(updateTheaterRequest.location());
-        theater.setCapacity(updateTheaterRequest.capacity());
         return theater;
     }
 }
