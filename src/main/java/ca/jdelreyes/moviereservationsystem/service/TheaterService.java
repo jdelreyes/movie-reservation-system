@@ -7,6 +7,7 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.CreateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.UpdateTheaterRequest;
+import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.model.MovieSchedule;
 import ca.jdelreyes.moviereservationsystem.model.Theater;
@@ -23,13 +24,13 @@ public interface TheaterService {
 
     public List<TheaterResponse> getTheaters(PageRequest pageRequest);
 
-    public TheaterDetailsResponse getTheater(Long id);
+    public TheaterDetailsResponse getTheater(Long id) throws NotFoundException;
 
-    public TheaterResponse createTheater(CreateTheaterRequest createTheaterRequest,
+    public TheaterDetailsResponse createTheater(CreateTheaterRequest createTheaterRequest,
                                          List<CreateSeatRequest> createSeatRequestList);
 
-    public TheaterResponse updateTheater(Long id, UpdateTheaterRequest updateTheaterRequest,
-                                         List<UpdateSeatRequest> updateSeatRequestList);
+    public TheaterDetailsResponse updateTheater(Long id, UpdateTheaterRequest updateTheaterRequest,
+                                         List<UpdateSeatRequest> updateSeatRequestList) throws NotFoundException;
 
-    public void deleteTheater(Long id);
+    public void deleteTheater(Long id) throws NotFoundException;
 }

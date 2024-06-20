@@ -2,6 +2,7 @@ package ca.jdelreyes.moviereservationsystem.controller;
 
 import ca.jdelreyes.moviereservationsystem.dto.movie.CreateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.service.impl.MovieServiceImpl;
 import jakarta.validation.Valid;
@@ -46,5 +47,18 @@ public class MovieController {
                         .buildAndExpand(movieResponse.id())
                         .toUri())
                 .body(movieResponse);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<MovieResponse> updateMovie(@PathVariable("id") Long id,
+                                                     @Valid @RequestBody UpdateMovieRequest updateMovieRequest) throws NotFoundException {
+        return ResponseEntity.ok(movieService.updateMovie(id, updateMovieRequest));
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> deleteMovie(@PathVariable("id") Long id) throws NotFoundException {
+        movieService.deleteMovie(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

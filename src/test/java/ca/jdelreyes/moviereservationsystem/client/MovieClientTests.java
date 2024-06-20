@@ -42,27 +42,32 @@ public class MovieClientTests {
         assertThat(listResponseEntity.getBody().size()).isEqualTo(0);
     }
 
-    // todo if there's movies in the database
     @Test
     public void get_movie() {
+        createMovie();
+
+        ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
+                "/api/movies/1",
+                HttpMethod.GET,
+                null,
+                MovieResponse.class
+        );
+
+        assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(movieResponseResponseEntity.getBody()).isNotNull();
+        assertThat(movieResponseResponseEntity.getBody().title()).isEqualTo(createMovieRequest().title());
 
     }
 
     @Test
     public void create_movie() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
-        ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
-                "/api/movies",
-                HttpMethod.POST,
-                new HttpEntity<>(createMovieRequest(), headers),
-                MovieResponse.class
-        );
+        ResponseEntity<MovieResponse> movieResponseResponseEntity = createMovie();
 
         assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(Objects.requireNonNull(movieResponseResponseEntity.getHeaders().getLocation()).toString())
-                .isEqualTo("http://localhost:" + servletWebServerApplicationContext.getWebServer().getPort() + "/api/movies/1");
+                .isEqualTo("http://localhost:" +
+                        servletWebServerApplicationContext.getWebServer().getPort() +
+                        "/api/movies/1");
     }
 
     @Test
@@ -80,8 +85,10 @@ public class MovieClientTests {
         assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
     }
 
-    @Test// todo create movie first
+    @Test
     public void update_movie() {
+        createMovie();
+
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
 
@@ -89,10 +96,79 @@ public class MovieClientTests {
                 "/api/movies/{id}",
                 HttpMethod.PUT,
                 new HttpEntity<>(updateMovieRequest(), headers),
+                MovieResponse.class,
+                1
+        );
+
+        assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(movieResponseResponseEntity.getBody()).isNotNull();
+        assertThat(movieResponseResponseEntity.getBody().title()).isEqualTo(updateMovieRequest().title());
+        assertThat(movieResponseResponseEntity.getBody().description()).isEqualTo(updateMovieRequest().description());
+    }
+
+    @Test
+    public void update_movie_with_invalid_request_body_should_give_400() {
+        createMovie();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+
+        ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
+                "/api/movies/{id}",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateInvalidMovieRequest(), headers),
+                MovieResponse.class,
+                1
+        );
+
+        assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void delete_movie() {
+        createMovie();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+
+        ResponseEntity<Void> movieResponseResponseEntity = restTemplate.exchange(
+                "/api/movies/{id}",
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class,
+                1
+        );
+
+        assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void delete_non_existing_movie_returns_404() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+
+        ResponseEntity<Void> movieResponseResponseEntity = restTemplate.exchange(
+                "/api/movies/{id}",
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class,
+                999999
+        );
+
+        assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private ResponseEntity<MovieResponse> createMovie() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+
+        return restTemplate.exchange(
+                "/api/movies",
+                HttpMethod.POST,
+                new HttpEntity<>(createMovieRequest(), headers),
                 MovieResponse.class
         );
 
-        assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK); //todo
     }
 
     private UpdateMovieRequest updateMovieRequest() {
@@ -108,6 +184,10 @@ public class MovieClientTests {
 
     private CreateMovieRequest createInvalidMovieRequest() {
         return new CreateMovieRequest("", null, "", null);
+    }
+
+    private UpdateMovieRequest updateInvalidMovieRequest() {
+        return new UpdateMovieRequest("", null, "", null);
     }
 
     private String getAdminToken() {
