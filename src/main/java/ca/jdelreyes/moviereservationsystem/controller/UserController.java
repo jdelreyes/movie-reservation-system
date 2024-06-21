@@ -49,7 +49,7 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize(value = "hasAuthority('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable("id") Long id) throws NotFoundException {
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) throws NotFoundException {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
@@ -61,14 +61,14 @@ public class UserController {
     }
 
     @PutMapping("/update-password")
-    public ResponseEntity<?> updateOwnPassword(@AuthenticationPrincipal User user,
+    public ResponseEntity<Void> updateOwnPassword(@AuthenticationPrincipal User user,
                                                @Valid @RequestBody UpdateOwnPasswordRequest updateOwnPasswordRequest) throws NotFoundException, BadRequestException {
         userService.updateOwnPassword(user.getUsername(), updateOwnPasswordRequest);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/delete-account")
-    public ResponseEntity<?> deleteOwnAccount(@AuthenticationPrincipal User user) throws NotFoundException {
+    public ResponseEntity<Void> deleteOwnAccount(@AuthenticationPrincipal User user) throws NotFoundException {
         userService.deleteOwnAccount(user.getUsername());
         return ResponseEntity.noContent().build();
     }

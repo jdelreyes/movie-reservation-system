@@ -4,6 +4,7 @@ import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieSchedule
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
+import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.CreateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
@@ -23,6 +24,7 @@ import ca.jdelreyes.moviereservationsystem.service.TheaterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,7 +37,9 @@ public class TheaterServiceImpl implements TheaterService {
     private final MovieRepository movieRepository;
 
     @Override
-    public MovieScheduleResponse airMovie(CreateMovieScheduleRequest createMovieScheduleRequest) throws NotFoundException {
+    public MovieScheduleResponse airMovie(
+            CreateMovieScheduleRequest createMovieScheduleRequest
+    ) throws NotFoundException {
         Theater theater =
                 theaterRepository.findById(createMovieScheduleRequest.theaterId()).orElseThrow(NotFoundException::new);
         Movie movie =
@@ -68,7 +72,9 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
-    public MovieScheduleResponse rescheduleMovie(RescheduleMovieRequest rescheduleMovieRequest) throws NotFoundException {
+    public MovieScheduleResponse rescheduleMovie(
+            RescheduleMovieRequest rescheduleMovieRequest
+    ) throws NotFoundException {
         MovieSchedule movieSchedule = movieScheduleRepository
                 .findById(rescheduleMovieRequest.movieScheduleId())
                 .orElseThrow(NotFoundException::new);
@@ -94,46 +100,64 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
-    public TheaterDetailsResponse createTheater(CreateTheaterRequest createTheaterRequest,
-                                                List<CreateSeatRequest> createSeatRequestList) {
+    public TheaterResponse createTheater(CreateTheaterRequest createTheaterRequest) {
         Theater theater = Theater.builder()
                 .name(createTheaterRequest.name())
                 .location(createTheaterRequest.location())
                 .build();
 
         theaterRepository.save(theater);
-        List<Seat> seatList = seatRepository.saveAll(
-                createSeatRequestList
-                        .stream()
-                        .map((createSeatRequest -> Seat.builder()
-                                .theater(theater)
-                                .rowLetter(createSeatRequest.rowLetter())
-                                .seatNumber(createSeatRequest.seatNumber())
-                                .isReserved(false)
-                                .build()))
-                        .toList()
-        );
 
-        return Mapper.mapTheaterToTheaterDetailsResponse(theater, seatList);
+        return Mapper.mapTheaterToTheaterResponse(theater);
     }
 
-    //    fixme: updating a theater with the seats could lead to seats being reduced or added.
-//           should i separate the theater creation/update and seats creation/update?
     @Override
-    public TheaterDetailsResponse updateTheater(Long id,
-                                                UpdateTheaterRequest updateTheaterRequest,
-                                                List<UpdateSeatRequest> updateSeatRequestList) throws NotFoundException {
+    public List<SeatResponse> addTheaterSeats(
+            Long theaterId, List<CreateSeatRequest> createSeatRequestList
+    ) throws NotFoundException {
+        Theater theater = theaterRepository.findById(theaterId).orElseThrow(NotFoundException::new);
+
+        List<Seat> seatList = createSeatRequestList.stream()
+                .map(createSeatRequest -> Mapper.mapCreateSeatRequestToSeat(theater, createSeatRequest))
+                .toList();
+
+        seatRepository.saveAll(seatList);
+
+        return seatList.stream().map(Mapper::mapSeatToSeatResponse).toList();
+    }
+
+    @Override
+    public TheaterResponse updateTheater(Long id, UpdateTheaterRequest updateTheaterRequest) throws NotFoundException {
         Theater theater = theaterRepository.findById(id).orElseThrow(NotFoundException::new);
         theater = setTheater(theater, updateTheaterRequest);
 
+        theaterRepository.save(theater);
 
-        return null;
+        return Mapper.mapTheaterToTheaterResponse(theater);
     }
 
     @Override
+    public List<SeatResponse> editTheaterSeats(
+            Long theaterId, List<UpdateSeatRequest> updateSeatRequestList
+    ) throws NotFoundException {
+        Theater theater = theaterRepository.findById(theaterId).orElseThrow(NotFoundException::new);
+        seatRepository.deleteAllByTheater(theater);
+
+        List<Seat> seatList = updateSeatRequestList.stream()
+                .map(updateSeatRequest -> Mapper.mapUpdateSeatRequestToSeat(theater, updateSeatRequest))
+                .toList();
+
+        seatRepository.saveAll(seatList);
+
+        return seatList.stream().map(Mapper::mapSeatToSeatResponse).toList();
+    }
+
+    @Override
+    @Transactional
     public void deleteTheater(Long id) throws NotFoundException {
         Theater theater = theaterRepository.findById(id).orElseThrow(NotFoundException::new);
 
+        seatRepository.deleteAllByTheater(theater);
         theaterRepository.delete(theater);
     }
 

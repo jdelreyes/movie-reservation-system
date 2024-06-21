@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findAllByTheater(Theater theater);
+
+    void deleteAllByTheater(Theater theater);
 }

@@ -2,7 +2,9 @@ package ca.jdelreyes.moviereservationsystem.helper;
 
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
+import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
+import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
@@ -65,5 +67,23 @@ public class Mapper {
                 movieSchedule.getMovie(),
                 movieSchedule.getTheater()
         );
+    }
+
+    public static Seat mapCreateSeatRequestToSeat(Theater theater, CreateSeatRequest createSeatRequest) {
+        return Seat.builder()
+                .seatNumber(createSeatRequest.seatNumber())
+                .rowLetter(createSeatRequest.rowLetter())
+                .theater(theater)
+                .isReserved(true)
+                .build();
+    }
+
+    public static Seat mapUpdateSeatRequestToSeat(Theater theater, UpdateSeatRequest updateSeatRequest) {
+        return Seat.builder()
+                .seatNumber(updateSeatRequest.seatNumber())
+                .rowLetter(updateSeatRequest.rowLetter())
+                .theater(theater)
+                .isReserved(true)
+                .build();
     }
 }

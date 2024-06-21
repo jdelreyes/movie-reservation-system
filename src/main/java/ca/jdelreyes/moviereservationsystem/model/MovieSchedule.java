@@ -21,8 +21,8 @@ public class MovieSchedule {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isCancelled;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Movie movie;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Theater theater;
 }

@@ -28,7 +28,7 @@ public class TheaterClientTests {
     private TestRestTemplate restTemplate;
     @Autowired
     private ServletWebServerApplicationContext servletWebServerApplicationContext;
-    private HttpHeaders headers;
+    private final HttpHeaders headers = new HttpHeaders();
 
     @BeforeEach
     public void setup() {
@@ -38,8 +38,7 @@ public class TheaterClientTests {
                 AuthResponse.class
         );
 
-        headers.add(HttpHeaders.AUTHORIZATION, authResponse.token());
-
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer "+authResponse.token());
     }
 
     @Test
@@ -87,6 +86,8 @@ public class TheaterClientTests {
 
     @Test
     public void create_theater() {
+        System.out.println(headers);
+
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters",
                 HttpMethod.POST,
@@ -141,7 +142,7 @@ public class TheaterClientTests {
     @Test
     public void update_theater_with_invalid_request_body_should_return_400() {
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
-                "/api/theaters{id}",
+                "/api/theaters/{id}",
                 HttpMethod.PUT,
                 new HttpEntity<>(invalidUpdateTheaterRequest(), headers),
                 TheaterDetailsResponse.class,
@@ -155,7 +156,7 @@ public class TheaterClientTests {
     public void delete_theater() {
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
-                HttpMethod.PUT,
+                HttpMethod.DELETE,
                 new HttpEntity<>(headers),
                 Void.class,
                 1
@@ -171,7 +172,7 @@ public class TheaterClientTests {
                 HttpMethod.DELETE,
                 new HttpEntity<>(headers),
                 Void.class,
-                1
+                99999
         );
 
         assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
