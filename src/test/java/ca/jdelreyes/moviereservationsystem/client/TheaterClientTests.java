@@ -42,7 +42,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void get_theaters() {
+    public void GetTheatersShouldReturnTheaterResponseListAnd200HttpStatusCode() {
         ResponseEntity<List<TheaterResponse>> theaterListEntity = restTemplate.exchange(
                 "/api/theaters",
                 HttpMethod.GET,

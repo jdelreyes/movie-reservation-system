@@ -5,6 +5,6 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.time.LocalDateTime;
 
-public record RescheduleMovieRequest(@NotEmpty Long movieScheduleId, @Future LocalDateTime startTime,
+public record RescheduleMovieRequest(@Future LocalDateTime startTime,
                                      @Future LocalDateTime endTime) {
 }

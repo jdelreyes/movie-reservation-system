@@ -20,7 +20,7 @@ public interface TheaterService {
 
     MovieScheduleResponse cancelMovie(Long movieScheduleId) throws NotFoundException;
 
-    MovieScheduleResponse rescheduleMovie(RescheduleMovieRequest rescheduleMovieRequest) throws NotFoundException;
+    MovieScheduleResponse rescheduleMovie(Long movieScheduleId, RescheduleMovieRequest rescheduleMovieRequest) throws NotFoundException;
 
     List<TheaterResponse> getTheaters(PageRequest pageRequest);
 

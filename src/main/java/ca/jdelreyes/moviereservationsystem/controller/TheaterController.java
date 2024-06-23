@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -37,30 +38,33 @@ public class TheaterController {
         return ResponseEntity.ok(theaterService.airMovie(createMovieScheduleRequest));
     }
 
-    @PutMapping("/cancel-movie")
-    public ResponseEntity<MovieScheduleResponse> cancelMovie(Long movieScheduleId) throws NotFoundException {
+    @PutMapping("/cancel-movie/{movieScheduleId}")
+    public ResponseEntity<MovieScheduleResponse> cancelMovie(@PathVariable("movieScheduleId") Long movieScheduleId) throws NotFoundException {
         return ResponseEntity.ok(theaterService.cancelMovie(movieScheduleId));
     }
 
-    @PutMapping("/reschedule-movie")
+    @PutMapping("/reschedule-movie/{movieScheduleId}")
     public ResponseEntity<MovieScheduleResponse> rescheduleMovie(
-            RescheduleMovieRequest rescheduleMovieRequest
+            @PathVariable("movieScheduleId") Long movieScheduleId,
+            @Valid @RequestBody RescheduleMovieRequest rescheduleMovieRequest
     ) throws NotFoundException {
-        return ResponseEntity.ok(theaterService.rescheduleMovie(rescheduleMovieRequest));
+        return ResponseEntity.ok(theaterService.rescheduleMovie(movieScheduleId, rescheduleMovieRequest));
     }
 
-    @PostMapping("/add-seats")
+    @PostMapping("/add-seats/{theaterId}")
     public ResponseEntity<List<SeatResponse>> addTheaterSeats(
-            Long theaterId, List<CreateSeatRequest> createSeatRequestList
+            @PathVariable("theaterId") Long theaterId,
+            @Valid @RequestBody List<CreateSeatRequest> createSeatRequestList
     ) throws NotFoundException {
         return new ResponseEntity<>(
                 theaterService.addTheaterSeats(theaterId, createSeatRequestList), HttpStatus.CREATED
         );
     }
 
-    @PutMapping("/edit-seats")
+    @PutMapping("/edit-seats/{theaterId}")
     public ResponseEntity<List<SeatResponse>> editTheaterSeats(
-            Long theaterId, List<UpdateSeatRequest> updateSeatRequestList
+            @PathVariable("theaterId") Long theaterId,
+            @Valid @RequestBody List<UpdateSeatRequest> updateSeatRequestList
     ) throws NotFoundException {
         return ResponseEntity.ok(theaterService.editTheaterSeats(theaterId, updateSeatRequestList));
     }

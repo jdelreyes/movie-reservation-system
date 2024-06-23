@@ -73,10 +73,11 @@ public class TheaterServiceImpl implements TheaterService {
 
     @Override
     public MovieScheduleResponse rescheduleMovie(
+            Long movieScheduleId,
             RescheduleMovieRequest rescheduleMovieRequest
     ) throws NotFoundException {
         MovieSchedule movieSchedule = movieScheduleRepository
-                .findById(rescheduleMovieRequest.movieScheduleId())
+                .findById(movieScheduleId)
                 .orElseThrow(NotFoundException::new);
 
         movieSchedule.setStartTime(rescheduleMovieRequest.startTime());

@@ -1,9 +1,12 @@
 package ca.jdelreyes.moviereservationsystem.bootstrap;
 
+import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.model.Seat;
 import ca.jdelreyes.moviereservationsystem.model.Theater;
 import ca.jdelreyes.moviereservationsystem.model.User;
+import ca.jdelreyes.moviereservationsystem.model.enums.Genre;
 import ca.jdelreyes.moviereservationsystem.model.enums.Role;
+import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
 import ca.jdelreyes.moviereservationsystem.repository.SeatRepository;
 import ca.jdelreyes.moviereservationsystem.repository.TheaterRepository;
 import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
@@ -22,6 +25,7 @@ public class DataLoader implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final TheaterRepository theaterRepository;
     private final SeatRepository seatRepository;
+    private final MovieRepository movieRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -34,6 +38,24 @@ public class DataLoader implements CommandLineRunner {
                     .build();
 
             userRepository.save(user);
+        }
+        // movie
+        if (!movieRepository.existsById(1L) && !movieRepository.existsById(2L)) {
+            movieRepository.save(
+                    Movie.builder()
+                            .title("Jack The Builder")
+                            .description("A builder from the future")
+                            .genre(Genre.SCIENCE_FICTION)
+                            .build()
+            );
+
+            movieRepository.save(
+                    Movie.builder()
+                            .title("Titanic II")
+                            .description("Titanic did not sink due to global warming")
+                            .genre(Genre.DRAMA)
+                            .build()
+            );
         }
         // theater
         if (!theaterRepository.existsById(1L)) {

@@ -22,7 +22,9 @@ public class MovieSchedule {
     private LocalDateTime endTime;
     private Boolean isCancelled;
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "movie_id")
     private Movie movie;
     @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "theather_id")
     private Theater theater;
 }

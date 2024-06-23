@@ -26,7 +26,7 @@ public class UserClientTests {
     private TestRestTemplate restTemplate;
 
     @Test
-    public void get_users_should_return_UserResponse_List() {
+    public void GetUsersShouldReturnUserResponseListAnd200HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -44,7 +44,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void get_users_without_token_should_return_403() {
+    public void GetUsersWithoutTokenShouldReturn403HttpStatusCode() {
         ResponseEntity<List<UserResponse>> listResponseEntity = restTemplate.exchange(
                 "/api/users",
                 HttpMethod.GET,
@@ -57,7 +57,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void get_user_by_id_should_return_UserResponse() {
+    public void GetUserByIdShouldReturnUserResponseAnd200HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -79,25 +79,23 @@ public class UserClientTests {
     }
 
     @Test
-    public void get_user_by_wrong_id_should_return_404() {
+    public void GetUserWithNonExistingIdShouldReturn404HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
-
-        final int userId = 3;
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
                 "/api/users/{id}",
                 HttpMethod.GET,
                 new HttpEntity<>(headers),
                 UserResponse.class,
-                userId
+                999999
         );
 
         assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
-    public void update_own_profile_should_return_200() {
+    public void UpdateOwnProfileShouldReturnUserResponseAnd200HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -113,7 +111,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void update_own_profile_without_body_should_return_422() {
+    public void UpdateOwnProfileWithoutRequestBodyShouldReturn422HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -128,7 +126,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void update_own_password_should_return_204() {
+    public void UpdateOwnPasswordShouldReturn204HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -143,7 +141,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void update_own_password_with_wrong_old_password_should_return_400() {
+    public void UpdateOwnPasswordWithInvalidOrWrongOldPasswordShouldReturn400HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -158,7 +156,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void delete_own_account_should_return_204() {
+    public void DeleteOwnAccountShouldReturn204HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
@@ -173,7 +171,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void delete_own_account_without_token_should_return_403() {
+    public void DeleteOwnAccountWithoutTokenShouldReturn403HttpStatusCode() {
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/users/delete-account",
                 HttpMethod.DELETE,
@@ -185,7 +183,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void update_user_should_give_200() {
+    public void UpdateUserShouldReturnUserResponseAnd200HttpStatusCode() {
         getUserToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -202,7 +200,7 @@ public class UserClientTests {
     }
 
     @Test
-    public void delete_user_should_give_204() {
+    public void DeleteUserShouldReturn204HttpStatusCode() {
         getUserToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -220,22 +218,23 @@ public class UserClientTests {
     }
 
     @Test
-    public void update_user_without_admin_role_should_give_403() {
+    public void UpdateUserWithoutAdminTokenShouldReturn403HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
-                "/api/users/2",
+                "/api/users/{id}",
                 HttpMethod.PUT,
                 new HttpEntity<>(updateUserRequest(), headers),
-                UserResponse.class
+                UserResponse.class,
+                99999
         );
 
         assertThat(userResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
     @Test
-    public void delete_user_without_admin_role_should_give_403() {
+    public void DeleteUserWithoutAdminTokenShouldReturn403HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
 
