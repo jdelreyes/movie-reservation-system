@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 
 @AllArgsConstructor
@@ -20,4 +21,6 @@ public class Theater {
     private Long id;
     private String name;
     private String location;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<MovieSchedule> movieScheduleList;
 }

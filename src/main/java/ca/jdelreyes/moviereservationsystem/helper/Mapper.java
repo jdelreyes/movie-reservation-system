@@ -65,7 +65,8 @@ public class Mapper {
                 movieSchedule.getStartTime(),
                 movieSchedule.getEndTime(),
                 movieSchedule.getMovie(),
-                movieSchedule.getTheater()
+                movieSchedule.getTheater(),
+                movieSchedule.getIsCancelled()
         );
     }
 

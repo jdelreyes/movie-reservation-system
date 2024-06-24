@@ -6,5 +6,5 @@ import ca.jdelreyes.moviereservationsystem.model.Theater;
 import java.time.LocalDateTime;
 
 public record MovieScheduleResponse(Long id, LocalDateTime startTime, LocalDateTime endTime, Movie movie,
-                                    Theater theater) {
+                                    Theater theater, Boolean isCancelled) {
 }

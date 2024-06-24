@@ -1,20 +1,15 @@
 package ca.jdelreyes.moviereservationsystem.bootstrap;
 
-import ca.jdelreyes.moviereservationsystem.model.Movie;
-import ca.jdelreyes.moviereservationsystem.model.Seat;
-import ca.jdelreyes.moviereservationsystem.model.Theater;
-import ca.jdelreyes.moviereservationsystem.model.User;
+import ca.jdelreyes.moviereservationsystem.model.*;
 import ca.jdelreyes.moviereservationsystem.model.enums.Genre;
 import ca.jdelreyes.moviereservationsystem.model.enums.Role;
-import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
-import ca.jdelreyes.moviereservationsystem.repository.SeatRepository;
-import ca.jdelreyes.moviereservationsystem.repository.TheaterRepository;
-import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
+import ca.jdelreyes.moviereservationsystem.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -26,9 +21,13 @@ public class DataLoader implements CommandLineRunner {
     private final TheaterRepository theaterRepository;
     private final SeatRepository seatRepository;
     private final MovieRepository movieRepository;
+    private final MovieScheduleRepository movieScheduleRepository;
 
     @Override
     public void run(String... args) throws Exception {
+        Movie movie = null;
+        Theater theater = null;
+
         // user
         if (!userRepository.existsByUsername("admin")) {
             User user = User.builder()
@@ -41,7 +40,7 @@ public class DataLoader implements CommandLineRunner {
         }
         // movie
         if (!movieRepository.existsById(1L) && !movieRepository.existsById(2L)) {
-            movieRepository.save(
+            movie = movieRepository.save(
                     Movie.builder()
                             .title("Jack The Builder")
                             .description("A builder from the future")
@@ -57,21 +56,36 @@ public class DataLoader implements CommandLineRunner {
                             .build()
             );
         }
+
         // theater
         if (!theaterRepository.existsById(1L)) {
-            Theater theater = Theater.builder()
+            theater = Theater.builder()
                     .name("Theater")
                     .location("123 Street")
                     .build();
 
-            List<Seat> seatList = createSeat(theater);
+            theater = theaterRepository.save(theater);
 
-            theaterRepository.save(theater);
+            List<Seat> seatList = createSeats(theater);
+
             seatRepository.saveAll(seatList);
+        }
+
+        // movie-schedule
+        if (!movieScheduleRepository.existsById(1L)) {
+            movieScheduleRepository.save(
+                    MovieSchedule.builder()
+                            .movie(movie)
+                            .theater(theater)
+                            .startTime(LocalDateTime.now().plusDays(2))
+                            .endTime(LocalDateTime.now().plusDays(2).plusHours(2))
+                            .isCancelled(false)
+                            .build()
+            );
         }
     }
 
-    private List<Seat> createSeat(Theater theater) {
+    private List<Seat> createSeats(Theater theater) {
         return List.of(Seat.builder()
                         .seatNumber(1)
                         .rowLetter('A')

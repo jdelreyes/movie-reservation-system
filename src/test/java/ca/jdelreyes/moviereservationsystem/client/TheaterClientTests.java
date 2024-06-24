@@ -2,10 +2,17 @@ package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieScheduleRequest;
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
+import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
+import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
+import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.CreateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.UpdateTheaterRequest;
+import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +23,11 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,7 +47,143 @@ public class TheaterClientTests {
                 AuthResponse.class
         );
 
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer "+authResponse.token());
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authResponse.token());
+    }
+
+    @Test
+    public void AddTheaterSeatsShouldReturnSeatResponseListAnd201HttpStatusCode() {
+        restTemplate.exchange(
+                "/api/theaters",
+                HttpMethod.POST,
+                new HttpEntity<>(createTheaterRequest(), headers),
+                TheaterDetailsResponse.class
+        );
+
+        ResponseEntity<List<SeatResponse>> response = restTemplate.exchange(
+                "/api/theaters/add-seats/{theaterId}",
+                HttpMethod.POST,
+                new HttpEntity<>(createSeatRequestList(), headers),
+                new ParameterizedTypeReference<List<SeatResponse>>() {
+                },
+                2
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(createSeatRequestList().size());
+    }
+
+    @Test
+    public void EditTheaterSeatsShouldReturnSeatResponseListAnd200HttpStatusCode() {
+        restTemplate.exchange(
+                "/api/theaters",
+                HttpMethod.POST,
+                new HttpEntity<>(createTheaterRequest(), headers),
+                TheaterDetailsResponse.class
+        );
+
+        ResponseEntity<List<SeatResponse>> response = restTemplate.exchange(
+                "/api/theaters/edit-seats/{theaterId}",
+                HttpMethod.PUT,
+                new HttpEntity<>(updateSeatRequestList(), headers),
+                new ParameterizedTypeReference<List<SeatResponse>>() {
+                },
+                2
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().size()).isEqualTo(updateSeatRequestList().size());
+    }
+
+    @Test
+    public void AirMovieShouldReturnMovieScheduleResponseAnd200HttpStatusCode() {
+        CreateMovieScheduleRequest createMovieScheduleRequest = createMovieScheduleRequest();
+
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                "/api/theaters/air-movie",
+                HttpMethod.PUT,
+                new HttpEntity<>(createMovieScheduleRequest, headers),
+                MovieScheduleResponse.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().startTime()).isEqualTo(createMovieScheduleRequest.startTime());
+        assertThat(response.getBody().endTime()).isEqualTo(createMovieScheduleRequest.endTime());
+
+        System.out.println(response.getBody());
+    }
+
+    @Test
+    public void AirMovieWithInvalidRequestBodyShouldReturn400HttpStatusCode() {
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                "/api/theaters/air-movie",
+                HttpMethod.PUT,
+                new HttpEntity<>(createInvalidMovieScheduleRequest(), headers),
+                MovieScheduleResponse.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+    }
+
+    @Test
+    public void CancelMovieShouldReturnMovieScheduleResponseAnd200HttpStatusCode() {
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                "/api/theaters/cancel-movie/{movieScheduleId}",
+                HttpMethod.PUT,
+                new HttpEntity<>(headers),
+                MovieScheduleResponse.class,
+                1
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().isCancelled()).isEqualTo(true);
+    }
+
+    @Test
+    public void CancelMovieWithInvalidIdShouldReturn404HttpStatusCode() {
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                "/api/theaters/cancel-movie/{movieScheduleId}",
+                HttpMethod.PUT,
+                new HttpEntity<>(headers),
+                MovieScheduleResponse.class,
+                999999
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void RescheduleMovieShouldReturnMovieScheduleResponseAnd200HttpStatusCode() {
+        RescheduleMovieRequest rescheduleMovieRequest = rescheduleMovieRequest();
+
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                "/api/theaters/reschedule-movie/{movieScheduleId}",
+                HttpMethod.PUT,
+                new HttpEntity<>(rescheduleMovieRequest, headers),
+                MovieScheduleResponse.class,
+                1
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().startTime()).isEqualTo(rescheduleMovieRequest.startTime());
+        assertThat(response.getBody().endTime()).isEqualTo(rescheduleMovieRequest.endTime());
+    }
+
+    @Test
+    public void RescheduleMovieWithInvalidIdShouldReturn404HttpStatusCode() {
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                "/api/theaters/reschedule-movie/{movieScheduleId}",
+                HttpMethod.PUT,
+                new HttpEntity<>(rescheduleMovieRequest(), headers),
+                MovieScheduleResponse.class,
+                9999999
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 
     @Test
@@ -57,7 +202,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void get_theater() {
+    public void GetTheaterShouldReturnTheaterDetailsResponseAnd200HttpStatusCode() {
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
                 HttpMethod.GET,
@@ -72,7 +217,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void get_non_existing_theater_should_return_404() {
+    public void GetTheaterWithNonExistingIdShouldReturn404HttpStatusCode() {
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
                 HttpMethod.GET,
@@ -85,7 +230,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void create_theater() {
+    public void CreateTheaterShouldReturnTheaterDetailsResponseAndHttpHeaderLocationAnd201HttpStatusCode() {
         System.out.println(headers);
 
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
@@ -112,7 +257,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void create_theater_without_admin_token_should_return_403() {
+    public void CreateTheaterWithoutAdminTokenShouldReturn403HttpStatusCode() {
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters",
                 HttpMethod.POST,
@@ -124,12 +269,12 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void update_theater() {
-        ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
+    public void UpdateTheaterShouldReturnTheaterResponseAnd200HttpStatusCode() {
+        ResponseEntity<TheaterResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
                 HttpMethod.PUT,
                 new HttpEntity<>(updateTheaterRequest(), headers),
-                TheaterDetailsResponse.class,
+                TheaterResponse.class,
                 1
         );
 
@@ -140,12 +285,12 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void update_theater_with_invalid_request_body_should_return_400() {
-        ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
+    public void UpdateTheaterWithInvalidRequestBodyShouldReturn200HttpStatusCode() {
+        ResponseEntity<TheaterResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
                 HttpMethod.PUT,
                 new HttpEntity<>(invalidUpdateTheaterRequest(), headers),
-                TheaterDetailsResponse.class,
+                TheaterResponse.class,
                 1
         );
 
@@ -153,7 +298,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void delete_theater() {
+    public void DeleteTheaterShouldReturn204HttpStatusCode() {
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
                 HttpMethod.DELETE,
@@ -166,7 +311,7 @@ public class TheaterClientTests {
     }
 
     @Test
-    public void delete_non_existing_theater_should_return_404() {
+    public void DeleteTheaterWithNonExistingIdShouldReturn404HttpStatusCode() {
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/theaters/{id}",
                 HttpMethod.DELETE,
@@ -176,6 +321,47 @@ public class TheaterClientTests {
         );
 
         assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    private List<CreateSeatRequest> createSeatRequestList() {
+        return List.of(
+                new CreateSeatRequest('A', 1),
+                new CreateSeatRequest('A', 2),
+                new CreateSeatRequest('A', 3),
+                new CreateSeatRequest('B', 1),
+                new CreateSeatRequest('B', 2),
+                new CreateSeatRequest('C', 1),
+                new CreateSeatRequest('C', 2),
+                new CreateSeatRequest('C', 3)
+        );
+    }
+
+    private List<UpdateSeatRequest> updateSeatRequestList() {
+        return List.of(
+                new UpdateSeatRequest('Z', 1),
+                new UpdateSeatRequest('Z', 2),
+                new UpdateSeatRequest('Z', 3),
+                new UpdateSeatRequest('Y', 1),
+                new UpdateSeatRequest('Y', 2),
+                new UpdateSeatRequest('X', 1),
+                new UpdateSeatRequest('X', 2),
+                new UpdateSeatRequest('X', 3)
+        );
+    }
+
+    private RescheduleMovieRequest rescheduleMovieRequest() {
+        return new RescheduleMovieRequest(LocalDateTime.now().plusDays(7), LocalDateTime.now().plusDays(7).plusHours(2));
+    }
+
+    private CreateMovieScheduleRequest createMovieScheduleRequest() {
+        return new CreateMovieScheduleRequest(LocalDateTime.now().plusDays(1L),
+                LocalDateTime.now().plusDays(2L),
+                1L,
+                1L);
+    }
+
+    private CreateMovieScheduleRequest createInvalidMovieScheduleRequest() {
+        return new CreateMovieScheduleRequest(null, null, 0L, 999L);
     }
 
     private UpdateTheaterRequest updateTheaterRequest() {

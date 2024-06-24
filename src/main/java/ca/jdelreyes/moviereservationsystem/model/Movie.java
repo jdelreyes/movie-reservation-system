@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -23,4 +25,6 @@ public class Movie {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Genre genre;
+    @OneToMany(cascade = CascadeType.ALL)
+    private List<MovieSchedule> movieScheduleList;
 }

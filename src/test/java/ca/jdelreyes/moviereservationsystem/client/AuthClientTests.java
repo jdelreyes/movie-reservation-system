@@ -24,7 +24,7 @@ public class AuthClientTests {
     private final AuthRequest authRequest = new AuthRequest("username", "password");
 
     @Test
-    public void register() {
+    public void RegisterShouldReturnAuthResponseAnd200HttpStatusCode() {
         ResponseEntity<AuthResponse> authResponseResponseEntity = registerUser();
 
         assertThat(authResponseResponseEntity.getBody()).isNotNull();
@@ -33,7 +33,7 @@ public class AuthClientTests {
     }
 
     @Test
-    public void authenticate() {
+    public void AuthenticateShouldReturnAuthResponseAnd200HttpStatusCode() {
         ResponseEntity<AuthResponse> authResponseResponseEntity = registerUser();
 
         assertThat(authResponseResponseEntity.getBody()).isNotNull();
@@ -42,7 +42,7 @@ public class AuthClientTests {
     }
 
     @Test
-    public void authenticate_with_wrong_credentials_should_return_404() {
+    public void AuthenticateWithWrongCredentialsShouldReturn404HttpStatusCode() {
         registerUser();
         AuthRequest wrongAuthenticateCredentials = new AuthRequest("wrongUsername", "wrongPassword");
 
@@ -56,7 +56,7 @@ public class AuthClientTests {
     }
 
     @Test
-    public void register_twice_with_same_username_should_return_403() {
+    public void RegisterTwiceWithTheSameUsernameShouldReturn403HttpStatusCode() {
         registerUser();
         ResponseEntity<AuthResponse> authResponseResponseEntity = registerUser();
 

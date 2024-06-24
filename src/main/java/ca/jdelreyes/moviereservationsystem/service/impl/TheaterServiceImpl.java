@@ -138,6 +138,7 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
+    @Transactional
     public List<SeatResponse> editTheaterSeats(
             Long theaterId, List<UpdateSeatRequest> updateSeatRequestList
     ) throws NotFoundException {
@@ -158,8 +159,7 @@ public class TheaterServiceImpl implements TheaterService {
     public void deleteTheater(Long id) throws NotFoundException {
         Theater theater = theaterRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        seatRepository.deleteAllByTheater(theater);
-        theaterRepository.delete(theater);
+        movieScheduleRepository.deleteAllByTheater(theater);
     }
 
     private Theater setTheater(Theater theater, UpdateTheaterRequest updateTheaterRequest) {

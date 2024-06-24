@@ -21,10 +21,8 @@ public class MovieSchedule {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private Boolean isCancelled;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "movie_id")
+    @ManyToOne(cascade = {CascadeType.MERGE})
     private Movie movie;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "theather_id")
+    @ManyToOne(cascade = {CascadeType.MERGE})
     private Theater theater;
 }
