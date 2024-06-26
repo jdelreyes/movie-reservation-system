@@ -37,6 +37,8 @@ public class SecurityConfiguration {
                                         .hasAuthority(Role.USER.name())
                                         .requestMatchers("/api/movies/**", "/api/theaters/**")
                                         .hasAuthority(Role.ADMIN.name())
+                                        .requestMatchers("/api/actuator/**")
+                                        .hasAnyAuthority(Role.ACTUATOR.name(), Role.ADMIN.name())
                                         .anyRequest()
                                         .authenticated()
 //                                .anyRequest()
