@@ -2,6 +2,7 @@ package ca.jdelreyes.moviereservationsystem.bootstrap;
 
 import ca.jdelreyes.moviereservationsystem.model.*;
 import ca.jdelreyes.moviereservationsystem.model.enums.Genre;
+import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 import ca.jdelreyes.moviereservationsystem.model.enums.Role;
 import ca.jdelreyes.moviereservationsystem.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +80,7 @@ public class DataLoader implements CommandLineRunner {
                             .theater(theater)
                             .startTime(LocalDateTime.now().plusDays(2))
                             .endTime(LocalDateTime.now().plusDays(2).plusHours(2))
+                            .movieType(MovieType.REGULAR)
                             .isCancelled(false)
                             .build()
             );

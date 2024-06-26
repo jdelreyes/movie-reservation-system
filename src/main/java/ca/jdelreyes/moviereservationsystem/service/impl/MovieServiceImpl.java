@@ -6,11 +6,14 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.helper.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.Movie;
+import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
+import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
 import ca.jdelreyes.moviereservationsystem.service.MovieService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +21,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
+    private final MovieScheduleRepository movieScheduleRepository;
 
     @Override
     public List<MovieResponse> getMovies(PageRequest pageRequest) {
@@ -56,9 +60,11 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    @Transactional
     public void deleteMovie(Long id) throws NotFoundException {
         Movie movie = movieRepository.findById(id).orElseThrow(NotFoundException::new);
 
+        movieScheduleRepository.deleteAllByMovie(movie);
         movieRepository.delete(movie);
     }
 

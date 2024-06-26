@@ -12,6 +12,7 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.CreateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.UpdateTheaterRequest;
+import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -358,11 +359,13 @@ public class TheaterClientTests {
         return new CreateMovieScheduleRequest(LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(2),
                 1L,
-                1L);
+                1L,
+                MovieType.REGULAR
+                );
     }
 
     private CreateMovieScheduleRequest createInvalidMovieScheduleRequest() {
-        return new CreateMovieScheduleRequest(null, null, 0L, 999L);
+        return new CreateMovieScheduleRequest(null, null, 0L, 999L, null);
     }
 
     private UpdateTheaterRequest updateTheaterRequest() {

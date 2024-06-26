@@ -7,6 +7,7 @@ import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
+import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import ca.jdelreyes.moviereservationsystem.model.*;
 
@@ -66,6 +67,7 @@ public class Mapper {
                 movieSchedule.getEndTime(),
                 movieSchedule.getMovie(),
                 movieSchedule.getTheater(),
+                movieSchedule.getMovieType(),
                 movieSchedule.getIsCancelled()
         );
     }
@@ -86,5 +88,17 @@ public class Mapper {
                 .theater(theater)
                 .isReserved(true)
                 .build();
+    }
+
+    public static TicketResponse mapTicketToTicketResponse(Ticket ticket, Seat seat, MovieSchedule movieSchedule) {
+        return new TicketResponse(ticket.getId(),
+                ticket.getPrice(),
+                ticket.getPurchaseTime(),
+                seat.getRowLetter(),
+                seat.getSeatNumber(),
+                movieSchedule.getTheater().getName(),
+                movieSchedule.getTheater().getLocation(),
+                movieSchedule.getStartTime(),
+                movieSchedule.getEndTime());
     }
 }

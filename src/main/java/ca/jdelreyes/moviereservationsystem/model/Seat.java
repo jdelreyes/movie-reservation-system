@@ -18,7 +18,7 @@ public class Seat implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     private Theater theater;
     private Character rowLetter;
     private Integer seatNumber;

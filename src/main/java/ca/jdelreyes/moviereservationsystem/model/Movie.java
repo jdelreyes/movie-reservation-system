@@ -26,6 +26,6 @@ public class Movie implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Genre genre;
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.MERGE)
     private List<MovieSchedule> movieScheduleList;
 }

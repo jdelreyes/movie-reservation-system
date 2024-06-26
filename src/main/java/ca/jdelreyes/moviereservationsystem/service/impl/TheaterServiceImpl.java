@@ -160,6 +160,8 @@ public class TheaterServiceImpl implements TheaterService {
         Theater theater = theaterRepository.findById(id).orElseThrow(NotFoundException::new);
 
         movieScheduleRepository.deleteAllByTheater(theater);
+        seatRepository.deleteAllByTheater(theater);
+        theaterRepository.delete(theater);
     }
 
     private Theater setTheater(Theater theater, UpdateTheaterRequest updateTheaterRequest) {
