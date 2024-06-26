@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "movie_schedules")
-public class MovieSchedule {
+public class MovieSchedule implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,4 +26,10 @@ public class MovieSchedule {
     private Movie movie;
     @ManyToOne(cascade = {CascadeType.MERGE})
     private Theater theater;
+
+    @PrePersist
+    private void checkIfStartTimeIsAfterEndTime() {
+        if (startTime.isAfter(endTime))
+            throw new RuntimeException();
+    }
 }

@@ -350,12 +350,13 @@ public class TheaterClientTests {
     }
 
     private RescheduleMovieRequest rescheduleMovieRequest() {
-        return new RescheduleMovieRequest(LocalDateTime.now().plusDays(7), LocalDateTime.now().plusDays(7).plusHours(2));
+        return new RescheduleMovieRequest(LocalDateTime.now().plusDays(7),
+                LocalDateTime.now().plusDays(7).plusHours(2));
     }
 
     private CreateMovieScheduleRequest createMovieScheduleRequest() {
-        return new CreateMovieScheduleRequest(LocalDateTime.now().plusDays(1L),
-                LocalDateTime.now().plusDays(2L),
+        return new CreateMovieScheduleRequest(LocalDateTime.now().plusDays(2),
+                LocalDateTime.now().plusDays(2).plusHours(2),
                 1L,
                 1L);
     }
