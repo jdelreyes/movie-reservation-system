@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  movie-reservation-system:
+    container_name: movie-reservation-system
+    image: movie-reservation-system:1.0
+    ports:
+      - "8080:8080"
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - postgresql-movie-reservation-system
+    networks:
+      - movie-reservation-system-network
+
+  postgresql-movie-reservation-system:
+    container_name: postgresql-movie-reservation-system
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: movie-reservation-system
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - movie-reservation-system-network
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:8.3
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.ca
+      PGADMIN_DEFAULT_PASSWORD: password
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    depends_on:
+      - postgresql-movie-reservation-system
+    networks:
+      - movie-reservation-system-network
+
+networks:
+  movie-reservation-system-network:
+    driver: bridge
