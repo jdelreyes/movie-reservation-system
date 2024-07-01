@@ -6,7 +6,7 @@ import ca.jdelreyes.moviereservationsystem.dto.user.UpdateUserRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import ca.jdelreyes.moviereservationsystem.exception.BadRequestException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import ca.jdelreyes.moviereservationsystem.helper.Mapper;
+import ca.jdelreyes.moviereservationsystem.utils.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.User;
 import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
 import ca.jdelreyes.moviereservationsystem.service.UserService;

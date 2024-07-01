@@ -4,7 +4,7 @@ import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.CreateTicketRequest;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import ca.jdelreyes.moviereservationsystem.helper.Mapper;
+import ca.jdelreyes.moviereservationsystem.utils.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.*;
 import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
 import ca.jdelreyes.moviereservationsystem.repository.SeatRepository;

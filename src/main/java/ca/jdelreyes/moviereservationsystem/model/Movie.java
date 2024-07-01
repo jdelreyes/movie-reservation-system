@@ -23,6 +23,9 @@ public class Movie implements Serializable {
     private String title;
     private String description;
     private String director;
+
+    @OneToOne
+    private MovieImageData movieImageData;
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Genre genre;

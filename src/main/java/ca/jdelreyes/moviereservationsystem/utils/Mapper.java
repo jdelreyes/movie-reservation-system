@@ -1,6 +1,7 @@
-package ca.jdelreyes.moviereservationsystem.helper;
+package ca.jdelreyes.moviereservationsystem.utils;
 
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
+import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
@@ -10,6 +11,7 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import ca.jdelreyes.moviereservationsystem.model.*;
+import ca.jdelreyes.moviereservationsystem.repository.MovieImageDataRepository;
 
 import java.util.List;
 
@@ -100,5 +102,13 @@ public class Mapper {
                 movieSchedule.getTheater().getLocation(),
                 movieSchedule.getStartTime(),
                 movieSchedule.getEndTime());
+    }
+
+    public static MovieImageResponse mapMovieImageDataToMovieImageResponse(MovieImageData movieImageData) {
+        return new MovieImageResponse(movieImageData.getId(),
+                movieImageData.getName(),
+                movieImageData.getType(),
+                movieImageData.getCreatedAt(),
+                movieImageData.getData());
     }
 }
