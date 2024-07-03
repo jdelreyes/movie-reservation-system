@@ -11,7 +11,6 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import ca.jdelreyes.moviereservationsystem.model.*;
-import ca.jdelreyes.moviereservationsystem.repository.MovieImageDataRepository;
 
 import java.util.List;
 
@@ -30,6 +29,7 @@ public class Mapper {
         return new MovieResponse(
                 movie.getId(),
                 movie.getTitle(),
+                movie.getMovieImage().getData(),
                 movie.getDescription(),
                 movie.getDirector(),
                 movie.getGenre()
@@ -104,11 +104,11 @@ public class Mapper {
                 movieSchedule.getEndTime());
     }
 
-    public static MovieImageResponse mapMovieImageDataToMovieImageResponse(MovieImageData movieImageData) {
-        return new MovieImageResponse(movieImageData.getId(),
-                movieImageData.getName(),
-                movieImageData.getType(),
-                movieImageData.getCreatedAt(),
-                movieImageData.getData());
+    public static MovieImageResponse mapMovieImageToMovieImageResponse(MovieImage movieImage) {
+        return new MovieImageResponse(movieImage.getId(),
+                movieImage.getName(),
+                movieImage.getType(),
+                movieImage.getCreatedAt(),
+                movieImage.getData());
     }
 }

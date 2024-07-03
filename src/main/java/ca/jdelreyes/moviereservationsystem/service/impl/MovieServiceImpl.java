@@ -5,8 +5,8 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import ca.jdelreyes.moviereservationsystem.model.MovieImageData;
-import ca.jdelreyes.moviereservationsystem.repository.MovieImageDataRepository;
+import ca.jdelreyes.moviereservationsystem.model.MovieImage;
+import ca.jdelreyes.moviereservationsystem.repository.MovieImageRepository;
 import ca.jdelreyes.moviereservationsystem.utils.ImageUtil;
 import ca.jdelreyes.moviereservationsystem.utils.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.Movie;
@@ -27,11 +27,17 @@ import java.util.List;
 public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
     private final MovieScheduleRepository movieScheduleRepository;
-    private final MovieImageDataRepository movieImageDataRepository;
+    private final MovieImageRepository movieImageRepository;
 
     @Override
     public List<MovieResponse> getMovies(PageRequest pageRequest) {
         return movieRepository.findAll(pageRequest).stream().map(Mapper::mapMovieToMovieResponse).toList();
+    }
+
+    @Override
+    public MovieImageResponse getMovieImage(Long movieId) throws NotFoundException {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
+        return Mapper.mapMovieImageToMovieImageResponse(movie.getMovieImage());
     }
 
     @Override
@@ -42,16 +48,23 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieImageResponse uploadMovieImage(MultipartFile multipartFile) throws IOException {
-        MovieImageData movieImageData = MovieImageData.builder()
-                .name(multipartFile.getName())
-                .type(multipartFile.getContentType())
-                .data(ImageUtil.compressImage(multipartFile.getBytes()))
-                .build();
+    public MovieImageResponse uploadMovieImage(
+            Long movieId, MultipartFile multipartFile
+    ) throws IOException, NotFoundException {
+        MovieImage movieImage = movieImageRepository.save(
+                MovieImage.builder()
+                        .name(multipartFile.getName())
+                        .type(multipartFile.getContentType())
+                        .data(ImageUtil.compressImage(multipartFile.getBytes()))
+                        .build()
+        );
 
-        MovieImageData savedImageData = movieImageDataRepository.save(movieImageData);
+        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
+        movie.setMovieImage(movieImage);
 
-        return Mapper.mapMovieImageDataToMovieImageResponse(movieImageData);
+        movieRepository.save(movie);
+
+        return Mapper.mapMovieImageToMovieImageResponse(movieImage);
     }
 
     @Override

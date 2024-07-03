@@ -1,9 +1,9 @@
 package ca.jdelreyes.moviereservationsystem.repository;
 
-import ca.jdelreyes.moviereservationsystem.model.MovieImageData;
+import ca.jdelreyes.moviereservationsystem.model.MovieImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MovieImageDataRepository extends JpaRepository<MovieImageData, Long> {
+public interface MovieImageRepository extends JpaRepository<MovieImage, Long> {
 }

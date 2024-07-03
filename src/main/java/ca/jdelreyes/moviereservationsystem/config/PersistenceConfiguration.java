@@ -1,9 +1,9 @@
 package ca.jdelreyes.moviereservationsystem.config;
 
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.stereotype.Component;
 
-@Component
+@Configuration
 @EnableJpaAuditing
 public class PersistenceConfiguration {
 }

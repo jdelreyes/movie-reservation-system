@@ -25,10 +25,12 @@ public class Movie implements Serializable {
     private String director;
 
     @OneToOne
-    private MovieImageData movieImageData;
+    private MovieImage movieImage;
+
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Genre genre;
+
     @OneToMany(cascade = CascadeType.MERGE)
     private List<MovieSchedule> movieScheduleList;
 }

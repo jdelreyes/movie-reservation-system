@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "movie_image_data")
 @EntityListeners(AuditingEntityListener.class)
-public class MovieImageData {
+public class MovieImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

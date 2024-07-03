@@ -5,6 +5,7 @@ import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.CreateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
+import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.model.enums.Genre;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -57,6 +66,66 @@ public class MovieClientTests {
         assertThat(movieResponseResponseEntity.getBody()).isNotNull();
         // from DataLoader class
         assertThat(movieResponseResponseEntity.getBody().title()).isEqualTo("Jack The Builder");
+    }
+
+    @Test
+    public void uploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        URI uri;
+        String pathName = "src" + File.separator +
+                "test" + File.separator +
+                "resources" + File.separator +
+                "images" + File.separator +
+                "image.jpeg";
+        try {
+            uri = new URI("http://localhost:" +
+                    servletWebServerApplicationContext.getWebServer().getPort() +
+                    "/api/movies/1/image");
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        Optional<File> file = Optional.of(new File(pathName));
+
+        file.ifPresent(f -> {
+            FileSystemResource fileSystemResource = new FileSystemResource(f);
+
+            ResponseEntity<MovieImageResponse> response = restTemplate.exchange(
+                    "/api/movies/{id}/image",
+                    HttpMethod.POST,
+                    new HttpEntity<>(
+                            new LinkedMultiValueMap<String, Object>() {{
+                                add("image", fileSystemResource);
+                            }},
+                            headers
+                    ),
+                    MovieImageResponse.class,
+                    1
+            );
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().name()).isEqualTo("image");
+            assertThat(response.getBody().type()).isEqualTo("image/jpeg");
+            assertThat(response.getHeaders()).isNotNull();
+            assertThat(response.getHeaders().getLocation())
+                    .isEqualTo(uri);
+
+            response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    null,
+                    MovieImageResponse.class
+            );
+
+            assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+            assertThat(response.getBody()).isNotNull();
+            assertThat(response.getBody().name()).isEqualTo("image");
+            assertThat(response.getBody().type()).isEqualTo("image/jpeg");
+        });
     }
 
     @Test
