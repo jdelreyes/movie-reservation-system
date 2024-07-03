@@ -22,6 +22,9 @@ public class MovieImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne
+    private Movie movie;
+
     private String name;
     private String type;
 

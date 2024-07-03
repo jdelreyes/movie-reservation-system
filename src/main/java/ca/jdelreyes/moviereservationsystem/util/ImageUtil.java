@@ -1,4 +1,4 @@
-package ca.jdelreyes.moviereservationsystem.utils;
+package ca.jdelreyes.moviereservationsystem.util;
 
 import java.io.ByteArrayOutputStream;
 import java.util.zip.Deflater;

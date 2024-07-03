@@ -7,8 +7,8 @@ import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.model.MovieImage;
 import ca.jdelreyes.moviereservationsystem.repository.MovieImageRepository;
-import ca.jdelreyes.moviereservationsystem.utils.ImageUtil;
-import ca.jdelreyes.moviereservationsystem.utils.Mapper;
+import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
+import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
 import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
@@ -37,7 +37,11 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieImageResponse getMovieImage(Long movieId) throws NotFoundException {
         Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
-        return Mapper.mapMovieImageToMovieImageResponse(movie.getMovieImage());
+        MovieImage movieImage = movieImageRepository
+                .findByMovie(movie)
+                .orElseThrow(NotFoundException::new);
+
+        return Mapper.mapMovieImageToMovieImageResponse(movieImage);
     }
 
     @Override
@@ -51,18 +55,16 @@ public class MovieServiceImpl implements MovieService {
     public MovieImageResponse uploadMovieImage(
             Long movieId, MultipartFile multipartFile
     ) throws IOException, NotFoundException {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
+
         MovieImage movieImage = movieImageRepository.save(
                 MovieImage.builder()
                         .name(multipartFile.getName())
                         .type(multipartFile.getContentType())
                         .data(ImageUtil.compressImage(multipartFile.getBytes()))
+                        .movie(movie)
                         .build()
         );
-
-        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
-        movie.setMovieImage(movieImage);
-
-        movieRepository.save(movie);
 
         return Mapper.mapMovieImageToMovieImageResponse(movieImage);
     }
@@ -92,11 +94,16 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    public void deleteMovieImage(Long id) throws NotFoundException {
+    }
+
+    @Override
     @Transactional
     public void deleteMovie(Long id) throws NotFoundException {
         Movie movie = movieRepository.findById(id).orElseThrow(NotFoundException::new);
 
         movieScheduleRepository.deleteAllByMovie(movie);
+        movieImageRepository.deleteByMovie(movie);
         movieRepository.delete(movie);
     }
 

@@ -24,5 +24,7 @@ public interface MovieService {
 
     MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) throws NotFoundException;
 
+    void deleteMovieImage(Long id) throws NotFoundException;
+
     void deleteMovie(Long id) throws NotFoundException;
 }

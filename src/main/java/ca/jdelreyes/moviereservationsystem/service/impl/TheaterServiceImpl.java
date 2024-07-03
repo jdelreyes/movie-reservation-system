@@ -11,7 +11,7 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.UpdateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import ca.jdelreyes.moviereservationsystem.utils.Mapper;
+import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.model.MovieSchedule;
 import ca.jdelreyes.moviereservationsystem.model.Seat;

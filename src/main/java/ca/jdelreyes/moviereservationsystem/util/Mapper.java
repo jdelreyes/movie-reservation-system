@@ -1,4 +1,4 @@
-package ca.jdelreyes.moviereservationsystem.utils;
+package ca.jdelreyes.moviereservationsystem.util;
 
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
@@ -29,7 +29,6 @@ public class Mapper {
         return new MovieResponse(
                 movie.getId(),
                 movie.getTitle(),
-                movie.getMovieImage().getData(),
                 movie.getDescription(),
                 movie.getDirector(),
                 movie.getGenre()
