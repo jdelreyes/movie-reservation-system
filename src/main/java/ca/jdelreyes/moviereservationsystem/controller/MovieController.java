@@ -35,9 +35,9 @@ public class MovieController {
         )));
     }
 
-    @GetMapping("/{imageId}/image")
-    public ResponseEntity<MovieImageResponse> getMovieImage(@PathVariable("imageId") Long imageId) throws NotFoundException {
-        return ResponseEntity.ok(movieService.getMovieImage(imageId));
+    @GetMapping("/{id}/image")
+    public ResponseEntity<MovieImageResponse> getMovieImage(@PathVariable("id") Long id) throws NotFoundException {
+        return ResponseEntity.ok(movieService.getMovieImage(id));
     }
 
     @GetMapping("/{id}")
@@ -77,6 +77,13 @@ public class MovieController {
     public ResponseEntity<MovieResponse> updateMovie(@PathVariable("id") Long id,
                                                      @Valid @RequestBody UpdateMovieRequest updateMovieRequest) throws NotFoundException {
         return ResponseEntity.ok(movieService.updateMovie(id, updateMovieRequest));
+    }
+
+    @DeleteMapping("{id}/image")
+    public ResponseEntity<Void> deleteMovieImage(@PathVariable("id") Long id) throws NotFoundException {
+        movieService.deleteMovieImage(id);
+
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("{id}")

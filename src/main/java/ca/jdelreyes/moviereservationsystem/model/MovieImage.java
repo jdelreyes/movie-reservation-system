@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "movie_image_data")
+@Table(name = "movie_image")
 @EntityListeners(AuditingEntityListener.class)
 public class MovieImage {
     @Id
@@ -23,6 +23,7 @@ public class MovieImage {
     private Long id;
 
     @OneToOne
+    @PrimaryKeyJoinColumn
     private Movie movie;
 
     private String name;
@@ -32,5 +33,6 @@ public class MovieImage {
     private LocalDateTime createdAt;
 
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     private byte[] data;
 }

@@ -69,7 +69,7 @@ public class MovieClientTests {
     }
 
     @Test
-    public void uploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode() {
+    public void UploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -182,7 +182,7 @@ public class MovieClientTests {
     }
 
     @Test
-    public void UpdateMovieWithInvalidRequestBodyShouldReturn400() {
+    public void UpdateMovieWithInvalidRequestBodyShouldReturn400HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
 
@@ -198,7 +198,56 @@ public class MovieClientTests {
     }
 
     @Test
-    public void DeleteMovieShouldReturn204() {
+    public void DeleteMovieImageShouldReturn204HttpStatusCode() {
+        UploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/movies/{id}/image",
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class,
+                1
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void DeleteNonExistingMovieImageShouldReturn404HttpStatusCode() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/movies/{id}/image",
+                HttpMethod.DELETE,
+                new HttpEntity<>(headers),
+                Void.class,
+                99999
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    public void DeleteMovieImageWithoutAdminTokenShouldReturn403HttpStatusCode() {
+        UploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode();
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/movies/{id}/image",
+                HttpMethod.DELETE,
+                null,
+                Void.class,
+                1
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+    }
+
+    @Test
+    public void DeleteMovieShouldReturn204HttpStatusCode() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
 

@@ -36,9 +36,8 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieImageResponse getMovieImage(Long movieId) throws NotFoundException {
-        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
         MovieImage movieImage = movieImageRepository
-                .findByMovie(movie)
+                .findById(movieId)
                 .orElseThrow(NotFoundException::new);
 
         return Mapper.mapMovieImageToMovieImageResponse(movieImage);
@@ -95,6 +94,9 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public void deleteMovieImage(Long id) throws NotFoundException {
+        MovieImage movieImage = movieImageRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        movieImageRepository.delete(movieImage);
     }
 
     @Override
