@@ -89,6 +89,21 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
+    public List<MovieScheduleResponse> getTheaterMovieSchedules(Long theaterId) throws NotFoundException {
+        Theater theater = theaterRepository.findById(theaterId).orElseThrow(NotFoundException::new);
+        List<MovieSchedule> movieScheduleList = movieScheduleRepository.findAllByTheater(theater);
+
+        return movieScheduleList.stream().map(Mapper::mapMovieScheduleToMovieScheduleResponse).toList();
+    }
+
+    @Override
+    public MovieScheduleResponse getMovieSchedule(Long id) throws NotFoundException {
+        MovieSchedule movieSchedule = movieScheduleRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        return Mapper.mapMovieScheduleToMovieScheduleResponse(movieSchedule);
+    }
+
+    @Override
     public List<TheaterResponse> getTheaters(PageRequest pageRequest) {
         return theaterRepository.findAll(pageRequest).stream().map(Mapper::mapTheaterToTheaterResponse).toList();
     }
