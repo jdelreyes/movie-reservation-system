@@ -6,6 +6,12 @@ import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 
 import java.time.LocalDateTime;
 
-public record MovieScheduleResponse(Long id, LocalDateTime startTime, LocalDateTime endTime, Movie movie,
-                                    Theater theater, MovieType movieType, Boolean isCancelled) {
+// todo: movie and theater should be movieResponse and theaterResponse respectively
+public record MovieScheduleResponse(Long id,
+                                    LocalDateTime startTime,
+                                    LocalDateTime endTime,
+                                    Movie movie,
+                                    Theater theater,
+                                    MovieType movieType,
+                                    Boolean isCancelled) {
 }

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "movie_image")
+@Table(name = "movie_images")
 @EntityListeners(AuditingEntityListener.class)
 public class MovieImage {
     @Id

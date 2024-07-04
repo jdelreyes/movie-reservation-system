@@ -34,6 +34,6 @@ public class MovieSchedule implements Serializable {
     @PrePersist
     private void checkIfStartTimeIsAfterEndTime() {
         if (startTime.isAfter(endTime))
-            throw new RuntimeException();
+            throw new RuntimeException("startTime should not be after endTime");
     }
 }

@@ -4,6 +4,7 @@ import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.CreateTicketRequest;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
+import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.*;
 import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
@@ -60,7 +61,7 @@ public class SeatReservationServiceImpl implements SeatReservationService {
                 .movieSchedule(movieSchedule)
                 .seat(seat)
                 .user(user)
-                .price(0.0) // todo: need to make a pricing system?
+                .price(MovieType.valueOf(movieSchedule.getMovieType().name()).price)
                 .build();
 
         ticketRepository.save(ticket);

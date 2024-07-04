@@ -45,6 +45,7 @@ public class DataLoader implements CommandLineRunner {
                     Movie.builder()
                             .title("Jack The Builder")
                             .description("A builder from the future")
+                            .director("James Bond")
                             .genre(Genre.SCIENCE_FICTION)
                             .build()
             );
@@ -53,6 +54,7 @@ public class DataLoader implements CommandLineRunner {
                     Movie.builder()
                             .title("Titanic II")
                             .description("Titanic did not sink due to global warming")
+                            .director("Mark James")
                             .genre(Genre.DRAMA)
                             .build()
             );
