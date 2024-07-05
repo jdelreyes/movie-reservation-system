@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,19 +20,32 @@ public class MovieSchedule implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
+
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
+
+    private LocalDateTime ticketPurchaseOpeningDateTime;
+    private LocalDateTime ticketPurchaseClosingDateTime;
+
     private Boolean isCancelled;
+
     @Enumerated(EnumType.STRING)
     private MovieType movieType;
+
     @ManyToOne(cascade = {CascadeType.MERGE})
     private Movie movie;
+
     @ManyToOne(cascade = {CascadeType.MERGE})
     private Theater theater;
 
     @PrePersist
-    private void checkIfStartTimeIsAfterEndTime() {
-        if (startTime.isAfter(endTime))
-            throw new RuntimeException("startTime should not be after endTime");
+    @PreUpdate
+    private void checkDateTime() {
+        if (startDateTime.isAfter(endDateTime))
+            throw new RuntimeException("startDateTime should not be after endDateTime");
+        if (ticketPurchaseOpeningDateTime.isAfter(ticketPurchaseClosingDateTime))
+            throw new RuntimeException("ticketPurchaseOpeningDateTime should not be after ticketPurchaseClosingDateTime");
+        if (ticketPurchaseClosingDateTime.isAfter(startDateTime))
+            throw new RuntimeException("ticketPurchaseOpeningDateTime should not be after startDateTime");
     }
 }

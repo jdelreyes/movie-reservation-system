@@ -37,6 +37,7 @@ public class TheaterServiceImpl implements TheaterService {
     private final MovieRepository movieRepository;
 
     @Override
+    @Transactional
     public MovieScheduleResponse airMovie(
             CreateMovieScheduleRequest createMovieScheduleRequest
     ) throws NotFoundException {
@@ -46,8 +47,8 @@ public class TheaterServiceImpl implements TheaterService {
                 movieRepository.findById(createMovieScheduleRequest.movieId()).orElseThrow(NotFoundException::new);
 
         MovieSchedule movieSchedule = MovieSchedule.builder()
-                .startTime(createMovieScheduleRequest.startTime())
-                .endTime(createMovieScheduleRequest.endTime())
+                .startDateTime(createMovieScheduleRequest.startDateTime())
+                .endDateTime(createMovieScheduleRequest.endDateTime())
                 .movie(movie)
                 .isCancelled(false)
                 .theater(theater)
@@ -72,6 +73,7 @@ public class TheaterServiceImpl implements TheaterService {
     }
 
     @Override
+    @Transactional
     public MovieScheduleResponse rescheduleMovie(
             Long movieScheduleId,
             RescheduleMovieRequest rescheduleMovieRequest
@@ -80,8 +82,10 @@ public class TheaterServiceImpl implements TheaterService {
                 .findById(movieScheduleId)
                 .orElseThrow(NotFoundException::new);
 
-        movieSchedule.setStartTime(rescheduleMovieRequest.startTime());
-        movieSchedule.setEndTime(rescheduleMovieRequest.endTime());
+        movieSchedule.setStartDateTime(rescheduleMovieRequest.startDateTime());
+        movieSchedule.setEndDateTime(rescheduleMovieRequest.endDateTime());
+        movieSchedule.setTicketPurchaseOpeningDateTime(rescheduleMovieRequest.ticketPurchaseOpeningDateTime());
+        movieSchedule.setTicketPurchaseClosingDateTime(rescheduleMovieRequest.ticketPurchaseClosingDateTime());
 
         movieScheduleRepository.save(movieSchedule);
 

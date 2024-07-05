@@ -13,13 +13,13 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.UpdateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
-import net.bytebuddy.asm.Advice;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.cglib.core.Local;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +28,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -110,8 +109,8 @@ public class TheaterClientTests {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().startTime()).isEqualTo(createMovieScheduleRequest.startTime());
-        assertThat(response.getBody().endTime()).isEqualTo(createMovieScheduleRequest.endTime());
+        assertThat(response.getBody().startDateTime()).isEqualTo(createMovieScheduleRequest.startDateTime());
+        assertThat(response.getBody().endDateTime()).isEqualTo(createMovieScheduleRequest.endDateTime());
 
         System.out.println(response.getBody());
     }
@@ -170,8 +169,8 @@ public class TheaterClientTests {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().startTime()).isEqualTo(rescheduleMovieRequest.startTime());
-        assertThat(response.getBody().endTime()).isEqualTo(rescheduleMovieRequest.endTime());
+        assertThat(response.getBody().startDateTime()).isEqualTo(rescheduleMovieRequest.startDateTime());
+        assertThat(response.getBody().endDateTime()).isEqualTo(rescheduleMovieRequest.endDateTime());
     }
 
     @Test
@@ -352,20 +351,26 @@ public class TheaterClientTests {
 
     private RescheduleMovieRequest rescheduleMovieRequest() {
         return new RescheduleMovieRequest(LocalDateTime.now().plusDays(7),
-                LocalDateTime.now().plusDays(7).plusHours(2));
+                LocalDateTime.now().plusDays(7).plusHours(2),
+                LocalDateTime.now().plusDays(6).plusHours(20),
+                LocalDateTime.now().plusDays(6).plusHours(23)
+        );
     }
 
     private CreateMovieScheduleRequest createMovieScheduleRequest() {
-        return new CreateMovieScheduleRequest(LocalDateTime.now().plusDays(2),
+        return new CreateMovieScheduleRequest(
+                LocalDateTime.now().plusDays(2),
                 LocalDateTime.now().plusDays(2).plusHours(2),
+                LocalDateTime.now().plusDays(1).plusHours(20),
+                LocalDateTime.now().plusDays(1).plusHours(23),
                 1L,
                 1L,
                 MovieType.REGULAR
-                );
+        );
     }
 
     private CreateMovieScheduleRequest createInvalidMovieScheduleRequest() {
-        return new CreateMovieScheduleRequest(null, null, 0L, 999L, null);
+        return new CreateMovieScheduleRequest(null, null, null, null, 0L, 999L, null);
     }
 
     private UpdateTheaterRequest updateTheaterRequest() {

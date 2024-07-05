@@ -64,8 +64,10 @@ public class Mapper {
     public static MovieScheduleResponse mapMovieScheduleToMovieScheduleResponse(MovieSchedule movieSchedule) {
         return new MovieScheduleResponse(
                 movieSchedule.getId(),
-                movieSchedule.getStartTime(),
-                movieSchedule.getEndTime(),
+                movieSchedule.getStartDateTime(),
+                movieSchedule.getEndDateTime(),
+                movieSchedule.getTicketPurchaseOpeningDateTime(),
+                movieSchedule.getTicketPurchaseClosingDateTime(),
                 mapMovieToMovieResponse(movieSchedule.getMovie()),
                 mapTheaterToTheaterResponse(movieSchedule.getTheater()),
                 movieSchedule.getMovieType(),
@@ -99,8 +101,8 @@ public class Mapper {
                 seat.getSeatNumber(),
                 movieSchedule.getTheater().getName(),
                 movieSchedule.getTheater().getLocation(),
-                movieSchedule.getStartTime(),
-                movieSchedule.getEndTime());
+                movieSchedule.getStartDateTime(),
+                movieSchedule.getEndDateTime());
     }
 
     public static MovieImageResponse mapMovieImageToMovieImageResponse(MovieImage movieImage) {
