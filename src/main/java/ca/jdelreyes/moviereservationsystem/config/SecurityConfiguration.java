@@ -31,11 +31,11 @@ public class SecurityConfiguration {
                                 authorizationManagerRequestMatcherRegistry
                                         .requestMatchers("/api/auth/**")
                                         .permitAll()
-                                        .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/theaters/**")
+                                        .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/theaters/**", "/api/movie-schedules/**")
                                         .permitAll()
                                         .requestMatchers("/api/tickets/**")
                                         .hasAuthority(Role.USER.name())
-                                        .requestMatchers("/api/movies/**", "/api/theaters/**")
+                                        .requestMatchers("/api/movies/**", "/api/theaters/**", "/api/movie-schedules/**")
                                         .hasAuthority(Role.ADMIN.name())
                                         .requestMatchers("/api/actuator/**")
                                         .hasAnyAuthority(Role.ACTUATOR.name(), Role.ADMIN.name())

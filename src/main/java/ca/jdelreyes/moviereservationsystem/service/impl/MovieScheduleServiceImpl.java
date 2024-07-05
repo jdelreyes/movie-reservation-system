@@ -38,6 +38,8 @@ public class MovieScheduleServiceImpl implements MovieScheduleService {
         MovieSchedule movieSchedule = MovieSchedule.builder()
                 .startDateTime(createMovieScheduleRequest.startDateTime())
                 .endDateTime(createMovieScheduleRequest.endDateTime())
+                .ticketPurchaseOpeningDateTime(createMovieScheduleRequest.ticketPurchaseOpeningDateTime())
+                .ticketPurchaseClosingDateTime(createMovieScheduleRequest.ticketPurchaseClosingDateTime())
                 .movie(movie)
                 .isCancelled(false)
                 .theater(theater)
