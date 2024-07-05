@@ -4,6 +4,7 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.CreateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
+import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.model.MovieImage;
 import ca.jdelreyes.moviereservationsystem.repository.MovieImageRepository;
@@ -21,6 +22,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +56,9 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieImageResponse uploadMovieImage(
             Long movieId, MultipartFile multipartFile
-    ) throws IOException, NotFoundException {
+    ) throws IOException, NotFoundException, ForbiddenException {
+        if (!isFileImageType(multipartFile)) throw new ForbiddenException();
+
         Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
 
         MovieImage movieImage = movieImageRepository.save(
@@ -117,5 +122,14 @@ public class MovieServiceImpl implements MovieService {
                 .director(updateMovieRequest.director())
                 .genre(updateMovieRequest.genre())
                 .build();
+    }
+
+    private boolean isFileImageType(MultipartFile multipartFile) {
+        assert multipartFile.getContentType() != null;
+
+        Pattern pattern = Pattern.compile("image/.*", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(multipartFile.getContentType());
+
+        return matcher.find();
     }
 }

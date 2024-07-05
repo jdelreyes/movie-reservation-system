@@ -16,16 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 
 public interface TheaterService {
-    MovieScheduleResponse airMovie(CreateMovieScheduleRequest createMovieScheduleRequest) throws NotFoundException;
-
-    MovieScheduleResponse cancelMovie(Long movieScheduleId) throws NotFoundException;
-
-    MovieScheduleResponse rescheduleMovie(Long movieScheduleId, RescheduleMovieRequest rescheduleMovieRequest) throws NotFoundException;
-
-    List<MovieScheduleResponse> getTheaterMovieSchedules(Long theaterId) throws NotFoundException;
-
-    MovieScheduleResponse getMovieSchedule(Long id) throws NotFoundException;
-
     List<TheaterResponse> getTheaters(PageRequest pageRequest);
 
     TheaterDetailsResponse getTheater(Long id) throws NotFoundException;

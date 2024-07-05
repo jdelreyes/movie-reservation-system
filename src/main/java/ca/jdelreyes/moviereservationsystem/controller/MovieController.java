@@ -4,6 +4,7 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.CreateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
+import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.service.impl.MovieServiceImpl;
 import jakarta.validation.Valid;
@@ -45,11 +46,11 @@ public class MovieController {
         return ResponseEntity.ok(movieService.getMovie(id));
     }
 
-    @PostMapping("/{id}/image")
+    @PostMapping(value = "/{id}/image")
     public ResponseEntity<MovieImageResponse> uploadImage(
             @PathVariable("id") Long movieId,
-            @NotNull @RequestParam("image") MultipartFile multipartFile
-    ) throws IOException, NotFoundException {
+            @Valid @NotNull @RequestParam("image") MultipartFile multipartFile
+    ) throws IOException, NotFoundException, ForbiddenException {
         MovieImageResponse movieImageResponse = movieService.uploadMovieImage(movieId, multipartFile);
 
         return ResponseEntity

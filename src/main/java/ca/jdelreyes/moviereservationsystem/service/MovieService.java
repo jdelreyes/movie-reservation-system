@@ -4,6 +4,7 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.CreateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
+import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ public interface MovieService {
 
     MovieResponse getMovie(Long id) throws NotFoundException;
 
-    MovieImageResponse uploadMovieImage(Long movieId, MultipartFile multipartFile) throws IOException, NotFoundException;
+    MovieImageResponse uploadMovieImage(Long movieId, MultipartFile multipartFile) throws IOException, NotFoundException, ForbiddenException;
 
     MovieResponse createMovie(CreateMovieRequest createMovieRequest);
 
