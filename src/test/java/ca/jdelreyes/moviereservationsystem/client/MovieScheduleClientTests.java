@@ -27,6 +27,7 @@ public class MovieScheduleClientTests {
     @Autowired
     private ServletWebServerApplicationContext servletWebServerApplicationContext;
     private final HttpHeaders headers = new HttpHeaders();
+    private final int movieScheduleCount=2;
 
     @BeforeEach
     public void setup() {
@@ -54,8 +55,6 @@ public class MovieScheduleClientTests {
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().startDateTime()).isEqualTo(createMovieScheduleRequest.startDateTime());
         assertThat(response.getBody().endDateTime()).isEqualTo(createMovieScheduleRequest.endDateTime());
-
-        System.out.println(response.getBody());
     }
 
     @Test

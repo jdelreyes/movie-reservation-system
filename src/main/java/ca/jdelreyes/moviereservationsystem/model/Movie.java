@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,7 +26,4 @@ public class Movie implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private Genre genre;
-
-    @OneToMany(cascade = CascadeType.MERGE)
-    private List<MovieSchedule> movieScheduleList;
 }

@@ -27,6 +27,7 @@ public class DataLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Movie movie = null;
+        Movie movie2 = null;
         Theater theater = null;
 
         // user
@@ -50,7 +51,7 @@ public class DataLoader implements CommandLineRunner {
                             .build()
             );
 
-            movieRepository.save(
+            movie2 = movieRepository.save(
                     Movie.builder()
                             .title("Titanic II")
                             .description("Titanic did not sink due to global warming")
@@ -75,7 +76,7 @@ public class DataLoader implements CommandLineRunner {
         }
 
         // movie-schedule
-        if (!movieScheduleRepository.existsById(1L)) {
+        if (!movieScheduleRepository.existsById(1L) && !movieScheduleRepository.existsById(2L)) {
             movieScheduleRepository.save(
                     MovieSchedule.builder()
                             .movie(movie)
@@ -85,6 +86,19 @@ public class DataLoader implements CommandLineRunner {
                             .ticketPurchaseOpeningDateTime(LocalDateTime.now().plusDays(1).plusHours(20))
                             .ticketPurchaseClosingDateTime(LocalDateTime.now().plusDays(1).plusHours(23))
                             .movieType(MovieType.REGULAR)
+                            .isCancelled(false)
+                            .build()
+            );
+
+            movieScheduleRepository.save(
+                    MovieSchedule.builder()
+                            .movie(movie2)
+                            .theater(theater)
+                            .startDateTime(LocalDateTime.now().plusDays(3))
+                            .endDateTime(LocalDateTime.now().plusDays(3).plusHours(2))
+                            .ticketPurchaseOpeningDateTime(LocalDateTime.now().plusDays(2).plusHours(20))
+                            .ticketPurchaseClosingDateTime(LocalDateTime.now().plusDays(2).plusHours(23))
+                            .movieType(MovieType.MAX)
                             .isCancelled(false)
                             .build()
             );

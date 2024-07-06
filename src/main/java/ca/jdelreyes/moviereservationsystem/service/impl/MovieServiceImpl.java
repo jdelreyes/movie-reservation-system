@@ -33,8 +33,8 @@ public class MovieServiceImpl implements MovieService {
     private final MovieImageRepository movieImageRepository;
 
     @Override
-    public List<MovieResponse> getMovies(PageRequest pageRequest) {
-        return movieRepository.findAll(pageRequest).stream().map(Mapper::mapMovieToMovieResponse).toList();
+    public List<MovieResponse> getAvailableMovies(PageRequest pageRequest) {
+        return movieRepository.findAvailableMovies(pageRequest).stream().map(Mapper::mapMovieToMovieResponse).toList();
     }
 
     @Override

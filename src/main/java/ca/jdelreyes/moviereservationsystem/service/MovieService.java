@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 public interface MovieService {
-    List<MovieResponse> getMovies(PageRequest pageRequest);
+    List<MovieResponse> getAvailableMovies(PageRequest pageRequest);
 
     MovieImageResponse getMovieImage(Long movieId) throws NotFoundException;
 

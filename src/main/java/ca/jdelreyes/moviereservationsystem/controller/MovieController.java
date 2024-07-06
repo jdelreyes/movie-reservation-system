@@ -28,11 +28,13 @@ public class MovieController {
     private final MovieServiceImpl movieService;
 
     @GetMapping
-    public ResponseEntity<List<MovieResponse>> getMovies(Pageable pageable) {
-        return ResponseEntity.ok(movieService.getMovies(PageRequest.of(
+    public ResponseEntity<List<MovieResponse>> getAvailableMovies(Pageable pageable) {
+        final String TITLE_FILED = "m.title";
+
+        return ResponseEntity.ok(movieService.getAvailableMovies(PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                pageable.getSortOr(Sort.by(Sort.Direction.ASC, "title"))
+                pageable.getSortOr(Sort.by(Sort.Direction.ASC, TITLE_FILED))
         )));
     }
 

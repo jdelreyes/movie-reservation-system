@@ -17,8 +17,6 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.net.URI;
@@ -36,6 +34,7 @@ public class MovieClientTests {
     private TestRestTemplate restTemplate;
     @Autowired
     private ServletWebServerApplicationContext servletWebServerApplicationContext;
+    private final int movieCount = 2;
 
     @Test
     public void GetMoviesShouldReturnMovieResponseListAnd200HttpStatusCode() {
@@ -49,7 +48,8 @@ public class MovieClientTests {
 
         assertThat(listResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(listResponseEntity.getBody()).isNotNull();
-        assertThat(listResponseEntity.getBody().size()).isEqualTo(2);
+        assertThat(listResponseEntity.getBody().size()).isEqualTo(movieCount);
+        System.out.println(listResponseEntity.getBody());
     }
 
     @Test
