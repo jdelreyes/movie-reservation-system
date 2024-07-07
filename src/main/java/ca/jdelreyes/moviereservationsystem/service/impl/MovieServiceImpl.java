@@ -6,24 +6,26 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
+import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.model.MovieImage;
 import ca.jdelreyes.moviereservationsystem.repository.MovieImageRepository;
-import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
-import ca.jdelreyes.moviereservationsystem.util.Mapper;
-import ca.jdelreyes.moviereservationsystem.model.Movie;
 import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
 import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
 import ca.jdelreyes.moviereservationsystem.service.MovieService;
+import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
+import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -74,15 +76,22 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    public MovieResponse createMovie(CreateMovieRequest createMovieRequest) {
-        Movie movie = Movie.builder()
+    public MovieResponse createMovie(CreateMovieRequest createMovieRequest) throws IOException {
+        FileSystemResource imageResourcePlaceholder = createPlaceholderImage();
+
+        Movie movie = movieRepository.save(Movie.builder()
                 .title(createMovieRequest.title())
                 .description(createMovieRequest.description())
                 .director(createMovieRequest.director())
                 .genre(createMovieRequest.genre())
-                .build();
+                .build());
 
-        movieRepository.save(movie);
+        movieImageRepository.save(MovieImage.builder()
+                .movie(movie)
+                .data(imageResourcePlaceholder.getContentAsByteArray())
+                .type("image/jpeg")
+                .name(imageResourcePlaceholder.getFilename())
+                .build());
 
         return Mapper.mapMovieToMovieResponse(movie);
     }
@@ -131,5 +140,16 @@ public class MovieServiceImpl implements MovieService {
         Matcher matcher = pattern.matcher(multipartFile.getContentType());
 
         return matcher.find();
+    }
+
+    private FileSystemResource createPlaceholderImage() {
+        String pathName = "src" + File.separator +
+                "main" + File.separator +
+                "resources" + File.separator +
+                "images" + File.separator +
+                "placeholder.jpg";
+
+        File file = new File(pathName);
+        return new FileSystemResource(file);
     }
 }

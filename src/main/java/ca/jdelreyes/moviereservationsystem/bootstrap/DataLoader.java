@@ -7,9 +7,11 @@ import ca.jdelreyes.moviereservationsystem.model.enums.Role;
 import ca.jdelreyes.moviereservationsystem.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +25,7 @@ public class DataLoader implements CommandLineRunner {
     private final SeatRepository seatRepository;
     private final MovieRepository movieRepository;
     private final MovieScheduleRepository movieScheduleRepository;
+    private final MovieImageRepository movieImageRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -57,6 +60,25 @@ public class DataLoader implements CommandLineRunner {
                             .description("Titanic did not sink due to global warming")
                             .director("Mark James")
                             .genre(Genre.DRAMA)
+                            .build()
+            );
+
+            FileSystemResource placeholderImage = createPlaceholderImage();
+
+            movieImageRepository.save(
+                    MovieImage.builder()
+                            .data(placeholderImage.getContentAsByteArray())
+                            .name(placeholderImage.getFilename())
+                            .type("image/jpeg")
+                            .movie(movie)
+                            .build()
+            );
+            movieImageRepository.save(
+                    MovieImage.builder()
+                            .data(placeholderImage.getContentAsByteArray())
+                            .name(placeholderImage.getFilename())
+                            .type("image/jpeg")
+                            .movie(movie2)
                             .build()
             );
         }
@@ -142,5 +164,16 @@ public class DataLoader implements CommandLineRunner {
                         .isReserved(true)
                         .theater(theater)
                         .build());
+    }
+
+    private FileSystemResource createPlaceholderImage() {
+        String pathName = "src" + File.separator +
+                "main" + File.separator +
+                "resources" + File.separator +
+                "images" + File.separator +
+                "placeholder.jpg";
+
+        File file = new File(pathName);
+        return new FileSystemResource(file);
     }
 }

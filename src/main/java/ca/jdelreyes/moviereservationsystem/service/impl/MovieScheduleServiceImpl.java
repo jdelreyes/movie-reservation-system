@@ -83,7 +83,6 @@ public class MovieScheduleServiceImpl implements MovieScheduleService {
         return Mapper.mapMovieScheduleToMovieScheduleResponse(movieSchedule);
     }
 
-    //todo: finish implementation
     @Override
     public List<MovieScheduleResponse> getTheaterMovieSchedules(Long theaterId) throws NotFoundException {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(NotFoundException::new);

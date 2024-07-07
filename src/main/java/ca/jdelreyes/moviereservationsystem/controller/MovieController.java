@@ -64,7 +64,7 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<MovieResponse> createMovie(@Valid @RequestBody CreateMovieRequest createMovieRequest) {
+    public ResponseEntity<MovieResponse> createMovie(@Valid @RequestBody CreateMovieRequest createMovieRequest) throws IOException {
         MovieResponse movieResponse = movieService.createMovie(createMovieRequest);
 
         return ResponseEntity

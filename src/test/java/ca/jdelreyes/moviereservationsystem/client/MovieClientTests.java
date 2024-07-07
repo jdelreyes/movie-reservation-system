@@ -76,10 +76,10 @@ public class MovieClientTests {
 
         URI uri;
         String pathName = "src" + File.separator +
-                "test" + File.separator +
+                "main" + File.separator +
                 "resources" + File.separator +
                 "images" + File.separator +
-                "image.jpeg";
+                "placeholder.jpg";
         try {
             uri = new URI("http://localhost:" +
                     servletWebServerApplicationContext.getWebServer().getPort() +

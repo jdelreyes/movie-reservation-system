@@ -21,7 +21,7 @@ public interface MovieService {
 
     MovieImageResponse uploadMovieImage(Long movieId, MultipartFile multipartFile) throws IOException, NotFoundException, ForbiddenException;
 
-    MovieResponse createMovie(CreateMovieRequest createMovieRequest);
+    MovieResponse createMovie(CreateMovieRequest createMovieRequest) throws IOException;
 
     MovieResponse updateMovie(Long id, UpdateMovieRequest updateMovieRequest) throws NotFoundException;
 
