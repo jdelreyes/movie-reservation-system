@@ -40,6 +40,9 @@ public class MovieController {
 
     @GetMapping("/{id}/image")
     public ResponseEntity<MovieImageResponse> getMovieImage(@PathVariable("id") Long id) throws NotFoundException {
+//    public ResponseEntity<?> getMovieImage(@PathVariable("id") Long id) throws NotFoundException {
+//        return ResponseEntity.status(HttpStatus.OK)
+//                .contentType(MediaType.IMAGE_JPEG).body(movieService.getMovie(id).imageData());
         return ResponseEntity.ok(movieService.getMovieImage(id));
     }
 

@@ -5,6 +5,7 @@ import ca.jdelreyes.moviereservationsystem.model.enums.Genre;
 import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 import ca.jdelreyes.moviereservationsystem.model.enums.Role;
 import ca.jdelreyes.moviereservationsystem.repository.*;
+import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.FileSystemResource;
@@ -67,7 +68,7 @@ public class DataLoader implements CommandLineRunner {
 
             movieImageRepository.save(
                     MovieImage.builder()
-                            .data(placeholderImage.getContentAsByteArray())
+                            .data(ImageUtil.compressImage(placeholderImage.getContentAsByteArray()))
                             .name(placeholderImage.getFilename())
                             .type("image/jpeg")
                             .movie(movie)
@@ -75,7 +76,7 @@ public class DataLoader implements CommandLineRunner {
             );
             movieImageRepository.save(
                     MovieImage.builder()
-                            .data(placeholderImage.getContentAsByteArray())
+                            .data(ImageUtil.compressImage(placeholderImage.getContentAsByteArray()))
                             .name(placeholderImage.getFilename())
                             .type("image/jpeg")
                             .movie(movie2)

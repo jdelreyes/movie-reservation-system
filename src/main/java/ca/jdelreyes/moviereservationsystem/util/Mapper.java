@@ -25,13 +25,14 @@ public class Mapper {
         );
     }
 
-    public static MovieResponse mapMovieToMovieResponse(Movie movie) {
+    public static MovieResponse mapMovieToMovieResponse(Movie movie, MovieImage movieImage) {
         return new MovieResponse(
                 movie.getId(),
                 movie.getTitle(),
                 movie.getDescription(),
                 movie.getDirector(),
-                movie.getGenre()
+                movie.getGenre(),
+                ImageUtil.decompressImage(movieImage.getData())
         );
     }
 
@@ -61,14 +62,14 @@ public class Mapper {
         );
     }
 
-    public static MovieScheduleResponse mapMovieScheduleToMovieScheduleResponse(MovieSchedule movieSchedule) {
+    public static MovieScheduleResponse mapMovieScheduleToMovieScheduleResponse(MovieSchedule movieSchedule, MovieImage movieImage) {
         return new MovieScheduleResponse(
                 movieSchedule.getId(),
                 movieSchedule.getStartDateTime(),
                 movieSchedule.getEndDateTime(),
                 movieSchedule.getTicketPurchaseOpeningDateTime(),
                 movieSchedule.getTicketPurchaseClosingDateTime(),
-                mapMovieToMovieResponse(movieSchedule.getMovie()),
+                mapMovieToMovieResponse(movieSchedule.getMovie(), movieImage),
                 mapTheaterToTheaterResponse(movieSchedule.getTheater()),
                 movieSchedule.getMovieType(),
                 movieSchedule.getIsCancelled()
@@ -106,10 +107,12 @@ public class Mapper {
     }
 
     public static MovieImageResponse mapMovieImageToMovieImageResponse(MovieImage movieImage) {
-        return new MovieImageResponse(movieImage.getId(),
+        return new MovieImageResponse(
+                movieImage.getId(),
                 movieImage.getName(),
                 movieImage.getType(),
                 movieImage.getCreatedAt(),
-                movieImage.getData());
+                ImageUtil.decompressImage(movieImage.getData())
+        );
     }
 }

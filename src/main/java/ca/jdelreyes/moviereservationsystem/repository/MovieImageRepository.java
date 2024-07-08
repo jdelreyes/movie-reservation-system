@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MovieImageRepository extends JpaRepository<MovieImage, Long> {
+    MovieImage findByMovie(Movie movie);
+
     void deleteByMovie(Movie movie);
 }

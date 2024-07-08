@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MovieServiceImpl implements MovieService {
     private final MovieRepository movieRepository;
     private final MovieScheduleRepository movieScheduleRepository;
@@ -36,7 +37,11 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public List<MovieResponse> getAvailableMovies(PageRequest pageRequest) {
-        return movieRepository.findAvailableMovies(pageRequest).stream().map(Mapper::mapMovieToMovieResponse).toList();
+        return movieRepository
+                .findAvailableMovies(pageRequest)
+                .stream()
+                .map(movie -> Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie)))
+                .toList();
     }
 
     @Override
@@ -52,7 +57,7 @@ public class MovieServiceImpl implements MovieService {
     public MovieResponse getMovie(Long id) throws NotFoundException {
         Movie movie = movieRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        return Mapper.mapMovieToMovieResponse(movie);
+        return Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie));
     }
 
     @Override
@@ -93,7 +98,7 @@ public class MovieServiceImpl implements MovieService {
                 .name(imageResourcePlaceholder.getFilename())
                 .build());
 
-        return Mapper.mapMovieToMovieResponse(movie);
+        return Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie));
     }
 
     @Override
@@ -103,7 +108,7 @@ public class MovieServiceImpl implements MovieService {
 
         movieRepository.save(movie);
 
-        return Mapper.mapMovieToMovieResponse(movie);
+        return Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie));
     }
 
     @Override
@@ -114,7 +119,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    @Transactional
     public void deleteMovie(Long id) throws NotFoundException {
         Movie movie = movieRepository.findById(id).orElseThrow(NotFoundException::new);
 
