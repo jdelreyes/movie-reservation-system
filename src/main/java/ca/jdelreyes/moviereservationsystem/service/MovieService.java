@@ -6,14 +6,14 @@ import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
 
 public interface MovieService {
-    List<MovieResponse> getAvailableMovies(PageRequest pageRequest);
+    List<MovieResponse> getAvailableMovies(Pageable pageable);
 
     MovieImageResponse getMovieImage(Long movieId) throws NotFoundException;
 

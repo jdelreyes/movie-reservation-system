@@ -34,7 +34,7 @@ public class MovieClientTests {
     private TestRestTemplate restTemplate;
     @Autowired
     private ServletWebServerApplicationContext servletWebServerApplicationContext;
-    private final int movieCount = 2;
+    private final int movieCount = 6;
 
     @Test
     public void GetMoviesShouldReturnMovieResponseListAnd200HttpStatusCode() {
@@ -65,7 +65,7 @@ public class MovieClientTests {
         assertThat(movieResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(movieResponseResponseEntity.getBody()).isNotNull();
         // from DataLoader class
-        assertThat(movieResponseResponseEntity.getBody().title()).isEqualTo("Jack The Builder");
+        assertThat(movieResponseResponseEntity.getBody().title()).isEqualTo("Inception");
     }
 
     @Test

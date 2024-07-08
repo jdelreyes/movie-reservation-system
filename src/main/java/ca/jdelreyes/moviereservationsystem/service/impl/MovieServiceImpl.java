@@ -16,7 +16,7 @@ import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
 import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,9 +36,9 @@ public class MovieServiceImpl implements MovieService {
     private final MovieImageRepository movieImageRepository;
 
     @Override
-    public List<MovieResponse> getAvailableMovies(PageRequest pageRequest) {
+    public List<MovieResponse> getAvailableMovies(Pageable pageable) {
         return movieRepository
-                .findAvailableMovies(pageRequest)
+                .findAvailableMovies(pageable)
                 .stream()
                 .map(movie -> Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie)))
                 .toList();

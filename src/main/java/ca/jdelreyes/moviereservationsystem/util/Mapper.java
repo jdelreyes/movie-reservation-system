@@ -32,7 +32,7 @@ public class Mapper {
                 movie.getDescription(),
                 movie.getDirector(),
                 movie.getGenre(),
-                ImageUtil.decompressImage(movieImage.getData())
+                Mapper.mapMovieImageToMovieImageResponse(movieImage)
         );
     }
 
