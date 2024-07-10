@@ -107,12 +107,13 @@ public class Mapper {
     }
 
     public static MovieImageResponse mapMovieImageToMovieImageResponse(MovieImage movieImage) {
-        return new MovieImageResponse(
+        return movieImage != null
+                ? new MovieImageResponse(
                 movieImage.getId(),
                 movieImage.getName(),
                 movieImage.getType(),
                 movieImage.getCreatedAt(),
-                ImageUtil.decompressImage(movieImage.getData())
-        );
+                ImageUtil.decompressImage(movieImage.getData()))
+                : null;
     }
 }

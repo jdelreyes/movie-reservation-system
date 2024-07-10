@@ -11,6 +11,7 @@ FROM openjdk:17-alpine
 RUN mkdir /app
 
 COPY --from=builder /home/gradle/src/build/libs/*.jar /app/movie-reservation-system.jar
+COPY --from=builder /home/gradle/src/src/main/resources /app/resources
 
 EXPOSE 8080
 

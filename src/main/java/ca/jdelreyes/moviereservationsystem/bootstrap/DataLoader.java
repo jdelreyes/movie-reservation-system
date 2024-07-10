@@ -7,6 +7,7 @@ import ca.jdelreyes.moviereservationsystem.model.enums.Role;
 import ca.jdelreyes.moviereservationsystem.repository.*;
 import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,9 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 @RequiredArgsConstructor
 public class DataLoader implements CommandLineRunner {
+    @Value("${resource.url}")
+    private String resourceUri;
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TheaterRepository theaterRepository;
@@ -66,7 +70,9 @@ public class DataLoader implements CommandLineRunner {
                     movieRepository.save(
                             Movie.builder()
                                     .title("Inception")
-                                    .description("A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.")
+                                    .description("A thief who steals corporate secrets through the use" +
+                                            " of dream-sharing technology is given the inverse task of" +
+                                            " planting an idea into the mind of a C.E.O.")
                                     .director("Christopher Nolan")
                                     .genre(Genre.SCIENCE_FICTION)
                                     .build()
@@ -74,14 +80,16 @@ public class DataLoader implements CommandLineRunner {
                     movieRepository.save(
                             Movie.builder()
                                     .title("The Lion King")
-                                    .description("Lion prince Simba and his father are targeted by his bitter uncle, who wants to ascend the throne himself.")
+                                    .description("Lion prince Simba and his father are targeted by his" +
+                                            " bitter uncle, who wants to ascend the throne himself.")
                                     .director("Roger Allers, Rob Minkoff")
                                     .genre(Genre.ANIMATION)
                                     .build()
                     ),
                     movieRepository.save(Movie.builder()
                             .title("The Godfather")
-                            .description("The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son.")
+                            .description("The aging patriarch of an organized crime dynasty transfers" +
+                                    " control of his clandestine empire to his reluctant son.")
                             .director("Francis Ford Coppola")
                             .genre(Genre.CRIME)
                             .build()
@@ -89,7 +97,9 @@ public class DataLoader implements CommandLineRunner {
                     movieRepository.save(
                             Movie.builder()
                                     .title("Pulp Fiction")
-                                    .description("The lives of two mob hitmen, a boxer, a gangster and his wife, and a pair of diner bandits intertwine in four tales of violence and redemption.")
+                                    .description("The lives of two mob hitmen, a boxer, a gangster and" +
+                                            " his wife, and a pair of diner bandits intertwine in four" +
+                                            " tales of violence and redemption.")
                                     .director("Quentin Tarantino")
                                     .genre(Genre.THRILLER)
                                     .build()
@@ -97,7 +107,9 @@ public class DataLoader implements CommandLineRunner {
                     movieRepository.save(
                             Movie.builder()
                                     .title("Schindler's List")
-                                    .description("In German-occupied Poland during World War II, Oskar Schindler gradually becomes concerned for his Jewish workforce after witnessing their persecution by the Nazis.")
+                                    .description("In German-occupied Poland during World War II, Oskar Schindler" +
+                                            " gradually becomes concerned for his Jewish workforce after witnessing" +
+                                            " their persecution by the Nazis.")
                                     .director("Steven Spielberg")
                                     .genre(Genre.HISTORICAL)
                                     .build()
@@ -105,7 +117,9 @@ public class DataLoader implements CommandLineRunner {
                     movieRepository.save(
                             Movie.builder()
                                     .title("The Notebook")
-                                    .description("A poor yet passionate young man falls in love with a rich young woman, giving her a sense of freedom, but they are soon separated because of their social differences.")
+                                    .description("A poor yet passionate young man falls in love with a" +
+                                            " rich young woman, giving her a sense of freedom, but they" +
+                                            " are soon separated because of their social differences.")
                                     .director("Nick Cassavetes")
                                     .genre(Genre.ROMANCE)
                                     .build()
@@ -153,47 +167,43 @@ public class DataLoader implements CommandLineRunner {
     }
 
     private void createMovieImagesAndSchedules(Theater theater, Movie[] movies) {
-        FileSystemResource placeholderImage = createPlaceholderImage();
-        AtomicLong counter = new AtomicLong(2);
+        AtomicLong counter = new AtomicLong(1);
 
         Arrays.stream(movies).forEach(m ->
                 {
+                    FileSystemResource movieImage = createMovieImage(m.getId());
                     try {
                         movieImageRepository.save(
                                 movieImageRepository.save(
                                         MovieImage.builder()
-                                                .data(ImageUtil.compressImage(placeholderImage.getContentAsByteArray()))
-                                                .name(placeholderImage.getFilename())
-                                                .type("image/jpeg")
+                                                .data(ImageUtil.compressImage(movieImage.getContentAsByteArray()))
+                                                .name(movieImage.getFilename())
+                                                .type("image/png")
                                                 .movie(m)
                                                 .build()
                                 ));
-                        movieScheduleRepository.save(
-                                MovieSchedule.builder()
-                                        .movie(m)
-                                        .theater(theater)
-                                        .startDateTime(LocalDateTime.now().plusDays(counter.get()))
-                                        .endDateTime(LocalDateTime.now().plusDays(counter.get()).plusHours(2))
-                                        .ticketPurchaseOpeningDateTime(LocalDateTime.now().plusDays(counter.get() - 1).plusHours(20))
-                                        .ticketPurchaseClosingDateTime(LocalDateTime.now().plusDays(counter.get() - 1).plusHours(23))
-                                        .movieType(MovieType.MAX)
-                                        .isCancelled(false)
-                                        .build()
-                        );
-                        counter.getAndIncrement();
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
+                    movieScheduleRepository.save(
+                            MovieSchedule.builder()
+                                    .movie(m)
+                                    .theater(theater)
+                                    .startDateTime(LocalDateTime.now().plusDays(counter.get()))
+                                    .endDateTime(LocalDateTime.now().plusDays(counter.get()).plusHours(2))
+                                    .ticketPurchaseOpeningDateTime(LocalDateTime.now())
+                                    .ticketPurchaseClosingDateTime(LocalDateTime.now().plusHours(2))
+                                    .movieType(MovieType.MAX)
+                                    .isCancelled(false)
+                                    .build()
+                    );
+                    counter.getAndIncrement();
                 }
         );
     }
 
-    private FileSystemResource createPlaceholderImage() {
-        String pathName = "src" + File.separator +
-                "main" + File.separator +
-                "resources" + File.separator +
-                "images" + File.separator +
-                "placeholder.jpg";
+    private FileSystemResource createMovieImage(Long id) {
+        String pathName = resourceUri + id + ".png";
 
         File file = new File(pathName);
         return new FileSystemResource(file);
