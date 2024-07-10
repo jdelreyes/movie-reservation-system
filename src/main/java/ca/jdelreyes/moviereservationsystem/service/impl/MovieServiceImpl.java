@@ -87,8 +87,8 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieRepository.save(Movie.builder()
                 .title(createMovieRequest.title())
                 .description(createMovieRequest.description())
-                .director(createMovieRequest.director())
-                .genre(createMovieRequest.genre())
+                .directors(createMovieRequest.directors())
+                .genres(createMovieRequest.genres())
                 .build());
 
         movieImageRepository.save(MovieImage.builder()
@@ -132,8 +132,8 @@ public class MovieServiceImpl implements MovieService {
                 .id(id)
                 .title(updateMovieRequest.title())
                 .description(updateMovieRequest.description())
-                .director(updateMovieRequest.director())
-                .genre(updateMovieRequest.genre())
+                .directors(updateMovieRequest.directors())
+                .genres(updateMovieRequest.genres())
                 .build();
     }
 

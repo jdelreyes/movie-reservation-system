@@ -20,6 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+// todo:
+//  need to implement movie schedule filters based on parameters such as theater, date
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -102,6 +105,11 @@ public class MovieScheduleServiceImpl implements MovieScheduleService {
                                 movieSchedule, movieImageRepository.findByMovie(movieSchedule.getMovie())
                         ))
                 .toList();
+    }
+
+    @Override
+    public List<MovieScheduleResponse> getMovieMovieSchedules(Movie movie) throws NotFoundException {
+        return List.of();
     }
 
     @Override

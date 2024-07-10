@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   movie-reservation-system:
     container_name: movie-reservation-system

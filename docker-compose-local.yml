@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgresql-movie-reservation-system:
     container_name: postgresql-movie-reservation-system

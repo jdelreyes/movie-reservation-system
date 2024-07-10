@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -281,20 +282,23 @@ public class MovieClientTests {
     private UpdateMovieRequest updateMovieRequest() {
         return new UpdateMovieRequest("updatedTitanice",
                 "Updated boat sank",
-                "updated avatar director",
-                Genre.ACTION);
+                List.of("updated avatar director"),
+                Set.of(Genre.ACTION));
     }
 
     private CreateMovieRequest createMovieRequest() {
-        return new CreateMovieRequest("titanic", "boat sank", "avatar director", Genre.DRAMA);
+        return new CreateMovieRequest("titanic",
+                "boat sank",
+                List.of("avatar director"),
+                Set.of(Genre.DRAMA));
     }
 
     private CreateMovieRequest createInvalidMovieRequest() {
-        return new CreateMovieRequest("", null, "", null);
+        return new CreateMovieRequest("", null, List.of(), null);
     }
 
     private UpdateMovieRequest updateInvalidMovieRequest() {
-        return new UpdateMovieRequest("", null, "", null);
+        return new UpdateMovieRequest("", null, List.of(), null);
     }
 
     private String getAdminToken() {

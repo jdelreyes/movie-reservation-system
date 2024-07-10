@@ -30,8 +30,8 @@ public class Mapper {
                 movie.getId(),
                 movie.getTitle(),
                 movie.getDescription(),
-                movie.getDirector(),
-                movie.getGenre(),
+                movie.getDirectors(),
+                movie.getGenres(),
                 Mapper.mapMovieImageToMovieImageResponse(movieImage)
         );
     }

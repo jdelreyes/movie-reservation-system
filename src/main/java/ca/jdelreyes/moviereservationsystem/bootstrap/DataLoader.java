@@ -70,38 +70,39 @@ public class DataLoader implements CommandLineRunner {
                     movieRepository.save(
                             Movie.builder()
                                     .title("Inception")
-                                    .description("A thief who steals corporate secrets through the use" +
-                                            " of dream-sharing technology is given the inverse task of" +
-                                            " planting an idea into the mind of a C.E.O.")
-                                    .director("Christopher Nolan")
-                                    .genre(Genre.SCIENCE_FICTION)
+                                    .description("A thief who steals corporate secrets through the use of" +
+                                            " dream-sharing technology is given the inverse task of planting" +
+                                            " an idea into the mind of a C.E.O.")
+                                    .directors(List.of("Christopher Nolan"))
+                                    .genres(Set.of(Genre.SCIENCE_FICTION, Genre.THRILLER))
                                     .build()
                     ),
                     movieRepository.save(
                             Movie.builder()
                                     .title("The Lion King")
-                                    .description("Lion prince Simba and his father are targeted by his" +
-                                            " bitter uncle, who wants to ascend the throne himself.")
-                                    .director("Roger Allers, Rob Minkoff")
-                                    .genre(Genre.ANIMATION)
+                                    .description("Lion prince Simba and his father are targeted by his bitter" +
+                                            " uncle, who wants to ascend the throne himself.")
+                                    .directors(List.of("Roger Allers", "Rob Minkoff"))
+                                    .genres(Set.of(Genre.ANIMATION, Genre.DRAMA))
                                     .build()
                     ),
-                    movieRepository.save(Movie.builder()
-                            .title("The Godfather")
-                            .description("The aging patriarch of an organized crime dynasty transfers" +
-                                    " control of his clandestine empire to his reluctant son.")
-                            .director("Francis Ford Coppola")
-                            .genre(Genre.CRIME)
-                            .build()
+                    movieRepository.save(
+                            Movie.builder()
+                                    .title("The Godfather")
+                                    .description("The aging patriarch of an organized crime dynasty transfers" +
+                                            " control of his clandestine empire to his reluctant son.")
+                                    .directors(List.of("Francis Ford Coppola"))
+                                    .genres(Set.of(Genre.CRIME, Genre.DRAMA))
+                                    .build()
                     ),
                     movieRepository.save(
                             Movie.builder()
                                     .title("Pulp Fiction")
-                                    .description("The lives of two mob hitmen, a boxer, a gangster and" +
-                                            " his wife, and a pair of diner bandits intertwine in four" +
-                                            " tales of violence and redemption.")
-                                    .director("Quentin Tarantino")
-                                    .genre(Genre.THRILLER)
+                                    .description("The lives of two mob hitmen, a boxer, a gangster and his wife," +
+                                            " and a pair of diner bandits intertwine in four tales of violence" +
+                                            " and redemption.")
+                                    .directors(List.of("Quentin Tarantino"))
+                                    .genres(Set.of(Genre.THRILLER, Genre.CRIME))
                                     .build()
                     ),
                     movieRepository.save(
@@ -110,18 +111,18 @@ public class DataLoader implements CommandLineRunner {
                                     .description("In German-occupied Poland during World War II, Oskar Schindler" +
                                             " gradually becomes concerned for his Jewish workforce after witnessing" +
                                             " their persecution by the Nazis.")
-                                    .director("Steven Spielberg")
-                                    .genre(Genre.HISTORICAL)
+                                    .directors(List.of("Steven Spielberg"))
+                                    .genres(Set.of(Genre.HISTORICAL, Genre.DRAMA, Genre.WAR))
                                     .build()
                     ),
                     movieRepository.save(
                             Movie.builder()
                                     .title("The Notebook")
-                                    .description("A poor yet passionate young man falls in love with a" +
-                                            " rich young woman, giving her a sense of freedom, but they" +
-                                            " are soon separated because of their social differences.")
-                                    .director("Nick Cassavetes")
-                                    .genre(Genre.ROMANCE)
+                                    .description("A poor yet passionate young man falls in love with a rich" +
+                                            " young woman, giving her a sense of freedom, but they are soon" +
+                                            " separated because of their social differences.")
+                                    .directors(List.of("Nick Cassavetes"))
+                                    .genres(Set.of(Genre.ROMANCE, Genre.DRAMA))
                                     .build()
                     )});
         }

@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Set;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,9 +24,7 @@ public class Movie implements Serializable {
 
     private String title;
     private String description;
-    private String director;
+    private List<String> directors;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private Genre genre;
+    private Set<Genre> genres;
 }
