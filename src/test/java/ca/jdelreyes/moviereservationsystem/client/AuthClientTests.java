@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,21 +25,19 @@ public class AuthClientTests {
     private final AuthRequest authRequest = new AuthRequest("username", "password");
 
     @Test
-    public void RegisterShouldReturnAuthResponseAnd200HttpStatusCode() {
-        ResponseEntity<AuthResponse> authResponseResponseEntity = registerUser();
+    public void RegisterShouldReturnAuthResponseAnd204HttpStatusCode() {
+        ResponseEntity<Void> response = registerUser();
 
-        assertThat(authResponseResponseEntity.getBody()).isNotNull();
-        assertThat(authResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(jwtService.extractUsername(authResponseResponseEntity.getBody().token())).isEqualTo(authRequest.username());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
     }
 
     @Test
     public void AuthenticateShouldReturnAuthResponseAnd200HttpStatusCode() {
-        ResponseEntity<AuthResponse> authResponseResponseEntity = registerUser();
+        registerUser();
+        ResponseEntity<Void> response = authenticate();
 
-        assertThat(authResponseResponseEntity.getBody()).isNotNull();
-        assertThat(authResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(jwtService.extractUsername(authResponseResponseEntity.getBody().token())).isEqualTo(authRequest.username());
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getHeaders().getFirst(HttpHeaders.SET_COOKIE)).isNotNull();
     }
 
     @Test
@@ -58,14 +57,20 @@ public class AuthClientTests {
     @Test
     public void RegisterTwiceWithTheSameUsernameShouldReturn403HttpStatusCode() {
         registerUser();
-        ResponseEntity<AuthResponse> authResponseResponseEntity = registerUser();
+        ResponseEntity<Void> response = registerUser();
 
-        assertThat(authResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
-    private ResponseEntity<AuthResponse> registerUser() {
+    private ResponseEntity<Void> registerUser() {
         return restTemplate.postForEntity("/api/auth/register",
                 authRequest,
-                AuthResponse.class);
+                Void.class);
+    }
+
+    private ResponseEntity<Void> authenticate() {
+        return restTemplate.postForEntity("/api/auth/authenticate",
+                authRequest,
+                Void.class);
     }
 }

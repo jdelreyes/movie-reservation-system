@@ -43,10 +43,6 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         userRepository.save(user);
-
-        jwtService.generateToken(new HashMap<>() {{
-            put("roles", user.getRoles());
-        }}, user);
     }
 
     private boolean passwordMatches(String rawPassword, String hash) {

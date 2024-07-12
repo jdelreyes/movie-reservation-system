@@ -33,7 +33,7 @@ public class SecurityConfiguration {
                                         .permitAll()
                                         .requestMatchers(HttpMethod.GET, "/api/movies/**", "/api/theaters/**", "/api/movie-schedules/**")
                                         .permitAll()
-                                        .requestMatchers("/api/tickets/**")
+                                        .requestMatchers("/api/seat-reservations/**")
                                         .hasAuthority(Role.USER.name())
                                         .requestMatchers("/api/movies/**", "/api/theaters/**", "/api/movie-schedules/**")
                                         .hasAuthority(Role.ADMIN.name())

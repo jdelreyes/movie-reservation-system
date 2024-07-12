@@ -1,7 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
-import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieScheduleRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
@@ -12,10 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,17 +30,64 @@ public class MovieScheduleClientTests {
     @Autowired
     private ServletWebServerApplicationContext servletWebServerApplicationContext;
     private final HttpHeaders headers = new HttpHeaders();
-    private final int movieScheduleCount=2;
+    private final int movieScheduleCount = 8;
+    private final String movieScheduleUri = "/api/movie-schedules";
 
     @BeforeEach
-    public void setup() {
-        AuthResponse authResponse = this.restTemplate.postForObject(
+    public void setUp() {
+        final String REGEX = "(token=[^;]+)";
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "/api/auth/authenticate",
-                new AuthRequest("admin", "password"),
-                AuthResponse.class
+                HttpMethod.POST,
+                new HttpEntity<>(authRequest()),
+                Void.class
         );
 
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authResponse.token());
+        final String SET_COOKIE = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(SET_COOKIE);
+
+        if (matcher.find()) {
+            headers.add(HttpHeaders.COOKIE, matcher.group(1));
+        }
+    }
+
+    @Test
+    public void GetMovieSchedulesShouldReturnMovieScheduleResponseListAnd200HttpStatusCode() {
+        ResponseEntity<List<MovieScheduleResponse>> response = restTemplate.exchange(
+                movieScheduleUri,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<MovieScheduleResponse>>() {
+                }
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(movieScheduleCount);
+
+        response = restTemplate.exchange(
+                movieScheduleUri + "?theater=1",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<MovieScheduleResponse>>() {
+                }
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(movieScheduleCount);
+
+        response = restTemplate.exchange(
+                movieScheduleUri + "?movie=1",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<List<MovieScheduleResponse>>() {
+                }
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody().size()).isEqualTo(2);
     }
 
     @Test
@@ -150,5 +200,9 @@ public class MovieScheduleClientTests {
 
     private CreateMovieScheduleRequest createInvalidMovieScheduleRequest() {
         return new CreateMovieScheduleRequest(null, null, null, null, 0L, 999L, null);
+    }
+
+    private AuthRequest authRequest() {
+        return new AuthRequest("admin", "password");
     }
 }

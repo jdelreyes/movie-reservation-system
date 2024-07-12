@@ -1,12 +1,12 @@
 package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
-import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.CreateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movie.MovieResponse;
 import ca.jdelreyes.moviereservationsystem.dto.movie.UpdateMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.movieimage.MovieImageResponse;
 import ca.jdelreyes.moviereservationsystem.model.enums.Genre;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -36,6 +38,28 @@ public class MovieClientTests {
     @Autowired
     private ServletWebServerApplicationContext servletWebServerApplicationContext;
     private final int movieCount = 6;
+    private final HttpHeaders headers = new HttpHeaders();
+
+    @BeforeEach
+    public void setUp() {
+        final String REGEX = "(token=[^;]+)";
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/auth/authenticate",
+                HttpMethod.POST,
+                new HttpEntity<>(authRequest()),
+                Void.class
+        );
+
+        final String SET_COOKIE = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(SET_COOKIE);
+
+        if (matcher.find()) {
+            headers.add(HttpHeaders.COOKIE, matcher.group(1));
+        }
+    }
 
     @Test
     public void GetMoviesShouldReturnMovieResponseListAnd200HttpStatusCode() {
@@ -71,8 +95,8 @@ public class MovieClientTests {
 
     @Test
     public void UploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+        CreateMovieShouldReturnHttpHeaderLocationAnd201HttpStatusCode();
+
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         URI uri;
@@ -80,11 +104,11 @@ public class MovieClientTests {
                 "main" + File.separator +
                 "resources" + File.separator +
                 "images" + File.separator +
-                "placeholder.jpg";
+                "placeholder.png";
         try {
             uri = new URI("http://localhost:" +
                     servletWebServerApplicationContext.getWebServer().getPort() +
-                    "/api/movies/1/image");
+                    "/api/movies/" + (movieCount + 1) + "/image");
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -104,13 +128,13 @@ public class MovieClientTests {
                             headers
                     ),
                     MovieImageResponse.class,
-                    1
+                    movieCount + 1
             );
 
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().name()).isEqualTo("image");
-            assertThat(response.getBody().type()).isEqualTo("image/jpeg");
+            assertThat(response.getBody().type()).isEqualTo("image/png");
             assertThat(response.getHeaders()).isNotNull();
             assertThat(response.getHeaders().getLocation())
                     .isEqualTo(uri);
@@ -125,15 +149,12 @@ public class MovieClientTests {
             assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
             assertThat(response.getBody()).isNotNull();
             assertThat(response.getBody().name()).isEqualTo("image");
-            assertThat(response.getBody().type()).isEqualTo("image/jpeg");
+            assertThat(response.getBody().type()).isEqualTo("image/png");
         });
     }
 
     @Test
     public void CreateMovieShouldReturnHttpHeaderLocationAnd201HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
                 "/api/movies",
                 HttpMethod.POST,
@@ -145,14 +166,11 @@ public class MovieClientTests {
         assertThat(Objects.requireNonNull(movieResponseResponseEntity.getHeaders().getLocation()).toString())
                 .isEqualTo("http://localhost:" +
                         servletWebServerApplicationContext.getWebServer().getPort() +
-                        "/api/movies/3");
+                        "/api/movies/" + (movieCount + 1));
     }
 
     @Test
     public void CreateMovieWithInvalidRequestBodyShouldReturn400HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
                 "/api/movies",
                 HttpMethod.POST,
@@ -165,9 +183,6 @@ public class MovieClientTests {
 
     @Test
     public void UpdateMovieShouldReturnUpdatedMovieResponseAnd200HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
                 "/api/movies/{id}",
                 HttpMethod.PUT,
@@ -184,9 +199,6 @@ public class MovieClientTests {
 
     @Test
     public void UpdateMovieWithInvalidRequestBodyShouldReturn400HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<MovieResponse> movieResponseResponseEntity = restTemplate.exchange(
                 "/api/movies/{id}",
                 HttpMethod.PUT,
@@ -202,9 +214,6 @@ public class MovieClientTests {
     public void DeleteMovieImageShouldReturn204HttpStatusCode() {
         UploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<Void> response = restTemplate.exchange(
                 "/api/movies/{id}/image",
                 HttpMethod.DELETE,
@@ -218,9 +227,6 @@ public class MovieClientTests {
 
     @Test
     public void DeleteNonExistingMovieImageShouldReturn404HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<Void> response = restTemplate.exchange(
                 "/api/movies/{id}/image",
                 HttpMethod.DELETE,
@@ -236,6 +242,8 @@ public class MovieClientTests {
     public void DeleteMovieImageWithoutAdminTokenShouldReturn403HttpStatusCode() {
         UploadMovieImageShouldReturnHttpHeaderLocationAnd201HttpStatusCode();
 
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
         ResponseEntity<Void> response = restTemplate.exchange(
                 "/api/movies/{id}/image",
                 HttpMethod.DELETE,
@@ -249,9 +257,6 @@ public class MovieClientTests {
 
     @Test
     public void DeleteMovieShouldReturn204HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<Void> movieResponseResponseEntity = restTemplate.exchange(
                 "/api/movies/{id}",
                 HttpMethod.DELETE,
@@ -265,9 +270,6 @@ public class MovieClientTests {
 
     @Test
     public void DeleteNonExistingMovieShouldReturn404() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
-
         ResponseEntity<Void> movieResponseResponseEntity = restTemplate.exchange(
                 "/api/movies/{id}",
                 HttpMethod.DELETE,
@@ -301,9 +303,7 @@ public class MovieClientTests {
         return new UpdateMovieRequest("", null, List.of(), null);
     }
 
-    private String getAdminToken() {
-        return restTemplate.postForObject("/api/auth/authenticate",
-                new AuthRequest("admin", "password"),
-                AuthResponse.class).token();
+    private AuthRequest authRequest() {
+        return new AuthRequest("admin", "password");
     }
 }

@@ -20,7 +20,6 @@ import java.util.Optional;
 public class MovieScheduleController {
     private final MovieScheduleServiceImpl movieScheduleService;
 
-    // todo: test
     @GetMapping
     public ResponseEntity<List<MovieScheduleResponse>> getMovieSchedules(
             @RequestParam(name = "theater") Optional<Long> theaterId,

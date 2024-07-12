@@ -1,7 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
-import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UpdateOwnPasswordRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UpdateOwnProfileRequest;
 import ca.jdelreyes.moviereservationsystem.dto.user.UpdateUserRequest;
@@ -16,6 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,11 +25,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class UserClientTests {
     @Autowired
     private TestRestTemplate restTemplate;
+    private final HttpHeaders headers = new HttpHeaders();
 
     @Test
     public void GetUsersShouldReturnUserResponseListAnd200HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<List<UserResponse>> listResponseEntity = restTemplate.exchange(
                 "/api/users",
@@ -58,8 +59,7 @@ public class UserClientTests {
 
     @Test
     public void GetUserByIdShouldReturnUserResponseAnd200HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         final int userId = 2;
 
@@ -80,8 +80,7 @@ public class UserClientTests {
 
     @Test
     public void GetUserWithNonExistingIdShouldReturn404HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
                 "/api/users/{id}",
@@ -96,8 +95,7 @@ public class UserClientTests {
 
     @Test
     public void UpdateOwnProfileShouldReturnUserResponseAnd200HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
                 "/api/users/update-profile",
@@ -112,8 +110,7 @@ public class UserClientTests {
 
     @Test
     public void UpdateOwnProfileWithoutRequestBodyShouldReturn422HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
                 "/api/users/update-profile",
@@ -127,8 +124,7 @@ public class UserClientTests {
 
     @Test
     public void UpdateOwnPasswordShouldReturn204HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/users/update-password",
@@ -142,8 +138,7 @@ public class UserClientTests {
 
     @Test
     public void UpdateOwnPasswordWithInvalidOrWrongOldPasswordShouldReturn400HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/users/update-password",
@@ -157,8 +152,7 @@ public class UserClientTests {
 
     @Test
     public void DeleteOwnAccountShouldReturn204HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/users/delete-account",
@@ -184,10 +178,8 @@ public class UserClientTests {
 
     @Test
     public void UpdateUserShouldReturnUserResponseAnd200HttpStatusCode() {
-        getUserToken();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+        registerUser();
+        authenticateAsAdmin();
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
                 "/api/users/2",
@@ -201,10 +193,8 @@ public class UserClientTests {
 
     @Test
     public void DeleteUserShouldReturn204HttpStatusCode() {
-        getUserToken();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getAdminToken());
+        registerUser();
+        authenticateAsAdmin();
 
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/users/{id}",
@@ -219,8 +209,7 @@ public class UserClientTests {
 
     @Test
     public void UpdateUserWithoutAdminTokenShouldReturn403HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        authenticateAsUser();
 
         ResponseEntity<UserResponse> userResponseResponseEntity = restTemplate.exchange(
                 "/api/users/{id}",
@@ -235,8 +224,7 @@ public class UserClientTests {
 
     @Test
     public void DeleteUserWithoutAdminTokenShouldReturn403HttpStatusCode() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + getUserToken());
+        registerUser();
 
         ResponseEntity<Void> voidResponseEntity = restTemplate.exchange(
                 "/api/users/2",
@@ -249,16 +237,54 @@ public class UserClientTests {
         assertThat(voidResponseEntity.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
     }
 
-    private String getAdminToken() {
-        return restTemplate.postForObject("/api/auth/authenticate",
-                new AuthRequest("admin", "password"),
-                AuthResponse.class).token();
+    private void authenticateAsAdmin() {
+
+        final String REGEX = "(token=[^;]+)";
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/auth/authenticate",
+                HttpMethod.POST,
+                new HttpEntity<>(new AuthRequest("admin", "password")),
+                Void.class
+        );
+
+        final String SET_COOKIE = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(SET_COOKIE);
+
+        if (matcher.find()) {
+            headers.add(HttpHeaders.COOKIE, matcher.group(1));
+        }
     }
 
-    private String getUserToken() {
-        return restTemplate.postForObject("/api/auth/register",
-                new AuthRequest("username", "password"),
-                AuthResponse.class).token();
+    private void registerUser() {
+        restTemplate.postForObject("/api/auth/register",
+                new AuthRequest("username", "password"), Void.class);
+    }
+
+    private void authenticateAsUser() {
+        restTemplate.postForObject("/api/auth/register",
+                new AuthRequest("username", "password"), Void.class
+        );
+
+        final String REGEX = "(token=[^;]+)";
+
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/auth/authenticate",
+                HttpMethod.POST,
+                new HttpEntity<>(new AuthRequest("username", "password")),
+                Void.class
+        );
+
+        final String SET_COOKIE = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(SET_COOKIE);
+
+        if (matcher.find()) {
+            headers.add(HttpHeaders.COOKIE, matcher.group(1));
+        }
     }
 
     private UpdateOwnProfileRequest updateOwnProfileRequest() {

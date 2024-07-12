@@ -1,11 +1,9 @@
 package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
-import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.CreateTicketRequest;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
-import org.apache.coyote.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,8 @@ import org.springframework.http.*;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,14 +31,30 @@ public class SeatReservationClientTests {
 
     @BeforeEach
     public void setUp() {
-        ResponseEntity<AuthResponse> response = restTemplate.exchange(
+        final String REGEX = "(token=[^;]+)";
+
+        restTemplate.exchange(
                 "/api/auth/register",
                 HttpMethod.POST,
                 new HttpEntity<>(authRequest()),
-                AuthResponse.class
+                Void.class
         );
 
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + response.getBody().token());
+        ResponseEntity<Void> response = restTemplate.exchange(
+                "/api/auth/authenticate",
+                HttpMethod.POST,
+                new HttpEntity<>(authRequest()),
+                Void.class
+        );
+
+        final String SET_COOKIE = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(SET_COOKIE);
+
+        if (matcher.find()) {
+            headers.add(HttpHeaders.COOKIE, matcher.group(1));
+        }
     }
 
     @Test

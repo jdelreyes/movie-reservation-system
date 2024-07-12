@@ -1,7 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
-import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
@@ -21,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -34,14 +35,24 @@ public class TheaterClientTests {
     private final HttpHeaders headers = new HttpHeaders();
 
     @BeforeEach
-    public void setup() {
-        AuthResponse authResponse = this.restTemplate.postForObject(
+    public void setUp() {
+        final String REGEX = "(token=[^;]+)";
+
+        ResponseEntity<Void> response = restTemplate.exchange(
                 "/api/auth/authenticate",
-                new AuthRequest("admin", "password"),
-                AuthResponse.class
+                HttpMethod.POST,
+                new HttpEntity<>(authRequest()),
+                Void.class
         );
 
-        headers.add(HttpHeaders.AUTHORIZATION, "Bearer " + authResponse.token());
+        final String SET_COOKIE = response.getHeaders().getFirst(HttpHeaders.SET_COOKIE);
+
+        Pattern pattern = Pattern.compile(REGEX);
+        Matcher matcher = pattern.matcher(SET_COOKIE);
+
+        if (matcher.find()) {
+            headers.add(HttpHeaders.COOKIE, matcher.group(1));
+        }
     }
 
     @Test
@@ -264,5 +275,9 @@ public class TheaterClientTests {
 
     private CreateTheaterRequest createTheaterRequest() {
         return new CreateTheaterRequest("Theater2", "456 Street");
+    }
+
+    private AuthRequest authRequest() {
+        return new AuthRequest("admin", "password");
     }
 }

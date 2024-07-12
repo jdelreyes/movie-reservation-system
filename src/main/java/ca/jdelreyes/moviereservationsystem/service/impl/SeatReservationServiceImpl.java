@@ -4,14 +4,14 @@ import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.CreateTicketRequest;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
-import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import ca.jdelreyes.moviereservationsystem.model.*;
+import ca.jdelreyes.moviereservationsystem.model.enums.MovieType;
 import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
 import ca.jdelreyes.moviereservationsystem.repository.SeatRepository;
 import ca.jdelreyes.moviereservationsystem.repository.TheaterRepository;
 import ca.jdelreyes.moviereservationsystem.repository.TicketRepository;
 import ca.jdelreyes.moviereservationsystem.service.SeatReservationService;
+import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class SeatReservationServiceImpl implements SeatReservationService {
     private final TicketRepository ticketRepository;
     private final TheaterRepository theaterRepository;
@@ -70,7 +71,6 @@ public class SeatReservationServiceImpl implements SeatReservationService {
     }
 
     @Override
-    @Transactional
     public void refundTicket(User user, Long ticketId) throws NotFoundException {
         Ticket ticket = ticketRepository
                 .findById(ticketId)

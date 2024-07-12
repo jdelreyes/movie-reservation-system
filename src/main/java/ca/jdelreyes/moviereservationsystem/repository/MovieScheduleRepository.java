@@ -18,7 +18,6 @@ public interface MovieScheduleRepository extends
 
     void deleteAllByMovie(Movie movie);
 
-    // todo: test
     @Query("SELECT ms FROM MovieSchedule ms " +
             "WHERE ms.theater = :theater " +
             "AND ms.ticketPurchaseOpeningDateTime <= CURRENT_TIMESTAMP " +

@@ -15,13 +15,11 @@ import ca.jdelreyes.moviereservationsystem.service.MovieService;
 import ca.jdelreyes.moviereservationsystem.util.ImageUtil;
 import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -82,20 +80,11 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public MovieResponse createMovie(CreateMovieRequest createMovieRequest) throws IOException {
-        FileSystemResource imageResourcePlaceholder = createPlaceholderImage();
-
         Movie movie = movieRepository.save(Movie.builder()
                 .title(createMovieRequest.title())
                 .description(createMovieRequest.description())
                 .directors(createMovieRequest.directors())
                 .genres(createMovieRequest.genres())
-                .build());
-
-        movieImageRepository.save(MovieImage.builder()
-                .movie(movie)
-                .data(imageResourcePlaceholder.getContentAsByteArray())
-                .type("image/jpeg")
-                .name(imageResourcePlaceholder.getFilename())
                 .build());
 
         return Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie));
@@ -144,16 +133,5 @@ public class MovieServiceImpl implements MovieService {
         Matcher matcher = pattern.matcher(multipartFile.getContentType());
 
         return matcher.find();
-    }
-
-    private FileSystemResource createPlaceholderImage() {
-        String pathName = "src" + File.separator +
-                "main" + File.separator +
-                "resources" + File.separator +
-                "images" + File.separator +
-                "placeholder.jpg";
-
-        File file = new File(pathName);
-        return new FileSystemResource(file);
     }
 }
