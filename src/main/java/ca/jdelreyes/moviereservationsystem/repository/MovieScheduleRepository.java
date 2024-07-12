@@ -14,12 +14,11 @@ import java.util.List;
 @Repository
 public interface MovieScheduleRepository extends
         CrudRepository<MovieSchedule, Long>, PagingAndSortingRepository<MovieSchedule, Long> {
-    List<MovieSchedule> findAllByTheater(Theater theater);
-
     void deleteAllByTheater(Theater theater);
 
     void deleteAllByMovie(Movie movie);
 
+    // todo: test
     @Query("SELECT ms FROM MovieSchedule ms " +
             "WHERE ms.theater = :theater " +
             "AND ms.ticketPurchaseOpeningDateTime <= CURRENT_TIMESTAMP " +
@@ -27,4 +26,26 @@ public interface MovieScheduleRepository extends
             "AND ms.isCancelled = false")
     List<MovieSchedule> findAvailableSchedulesForTheater(@Param("theater") Theater theater);
 
+    @Query("SELECT ms FROM MovieSchedule ms " +
+            "WHERE ms.movie = :movie " +
+            "AND ms.ticketPurchaseOpeningDateTime <= CURRENT_TIMESTAMP " +
+            "AND ms.ticketPurchaseClosingDateTime >= CURRENT_TIMESTAMP " +
+            "AND ms.isCancelled = false")
+    List<MovieSchedule> findAvailableSchedulesForMovie(@Param("movie") Movie movie);
+
+    @Query("SELECT ms FROM MovieSchedule ms " +
+            "WHERE ms.movie = :movie " +
+            "AND ms.theater = :theater " +
+            "AND ms.ticketPurchaseOpeningDateTime <= CURRENT_TIMESTAMP " +
+            "AND ms.ticketPurchaseClosingDateTime >= CURRENT_TIMESTAMP " +
+            "AND ms.isCancelled = false")
+    List<MovieSchedule> findAvailableSchedulesForMovieAndTheater(
+            @Param("movie") Movie movie, @Param("theater") Theater theater
+    );
+
+    @Query("SELECT ms FROM MovieSchedule ms " +
+            "WHERE ms.ticketPurchaseOpeningDateTime <= CURRENT_TIMESTAMP " +
+            "AND ms.ticketPurchaseClosingDateTime >= CURRENT_TIMESTAMP " +
+            "AND ms.isCancelled = false")
+    List<MovieSchedule> findAvailableMovieSchedules();
 }

@@ -11,11 +11,30 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.util.List;
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/api/movie-schedules")
 @RequiredArgsConstructor
 public class MovieScheduleController {
     private final MovieScheduleServiceImpl movieScheduleService;
+
+    // todo: test
+    @GetMapping
+    public ResponseEntity<List<MovieScheduleResponse>> getMovieSchedules(
+            @RequestParam(name = "theater") Optional<Long> theaterId,
+            @RequestParam(name = "movie") Optional<Long> movieId
+    ) throws NotFoundException {
+        if (theaterId.isPresent() && movieId.isPresent())
+            return ResponseEntity.ok(movieScheduleService.getTheaterAndMovieMovieSchedules(theaterId.get(), movieId.get()));
+        if (theaterId.isPresent())
+            return ResponseEntity.ok(movieScheduleService.getTheaterMovieSchedules(theaterId.get()));
+        if (movieId.isPresent())
+            return ResponseEntity.ok(movieScheduleService.getMovieMovieSchedules(movieId.get()));
+
+        return ResponseEntity.ok(movieScheduleService.getAvailableMovieSchedules());
+    }
 
     @PostMapping
     public ResponseEntity<MovieScheduleResponse> airMovie(
@@ -31,7 +50,6 @@ public class MovieScheduleController {
                         .toUri())
                 .body(movieScheduleResponse);
     }
-
 
     @PutMapping("/cancel-movie/{movieScheduleId}")
     public ResponseEntity<MovieScheduleResponse> cancelMovie(

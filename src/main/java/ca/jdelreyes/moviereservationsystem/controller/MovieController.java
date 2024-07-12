@@ -40,9 +40,6 @@ public class MovieController {
 
     @GetMapping("/{id}/image")
     public ResponseEntity<MovieImageResponse> getMovieImage(@PathVariable("id") Long id) throws NotFoundException {
-//    public ResponseEntity<?> getMovieImage(@PathVariable("id") Long id) throws NotFoundException {
-//        return ResponseEntity.status(HttpStatus.OK)
-//                .contentType(MediaType.IMAGE_JPEG).body(movieService.getMovie(id).imageData());
         return ResponseEntity.ok(movieService.getMovieImage(id));
     }
 
@@ -67,7 +64,9 @@ public class MovieController {
     }
 
     @PostMapping
-    public ResponseEntity<MovieResponse> createMovie(@Valid @RequestBody CreateMovieRequest createMovieRequest) throws IOException {
+    public ResponseEntity<MovieResponse> createMovie(
+            @Valid @RequestBody CreateMovieRequest createMovieRequest
+    ) throws IOException {
         MovieResponse movieResponse = movieService.createMovie(createMovieRequest);
 
         return ResponseEntity
@@ -80,8 +79,10 @@ public class MovieController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<MovieResponse> updateMovie(@PathVariable("id") Long id,
-                                                     @Valid @RequestBody UpdateMovieRequest updateMovieRequest) throws NotFoundException {
+    public ResponseEntity<MovieResponse> updateMovie(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody UpdateMovieRequest updateMovieRequest
+    ) throws NotFoundException {
         return ResponseEntity.ok(movieService.updateMovie(id, updateMovieRequest));
     }
 

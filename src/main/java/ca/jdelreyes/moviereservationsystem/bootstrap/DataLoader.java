@@ -194,12 +194,37 @@ public class DataLoader implements CommandLineRunner {
                                     .endDateTime(LocalDateTime.now().plusDays(counter.get()).plusHours(2))
                                     .ticketPurchaseOpeningDateTime(LocalDateTime.now())
                                     .ticketPurchaseClosingDateTime(LocalDateTime.now().plusHours(2))
-                                    .movieType(MovieType.MAX)
+                                    .movieType(MovieType.REGULAR)
                                     .isCancelled(false)
                                     .build()
                     );
                     counter.getAndIncrement();
                 }
+        );
+        movieScheduleRepository.save(
+                MovieSchedule.builder()
+                        .movie(movies[0])
+                        .theater(theater)
+                        .startDateTime(LocalDateTime.now().plusHours(2))
+                        .endDateTime(LocalDateTime.now().plusHours(4))
+                        .ticketPurchaseOpeningDateTime(LocalDateTime.now())
+                        .ticketPurchaseClosingDateTime(LocalDateTime.now().plusHours(1).plusMinutes(59))
+                        .movieType(MovieType.MAX)
+                        .isCancelled(false)
+                        .build()
+        );
+
+        movieScheduleRepository.save(
+                MovieSchedule.builder()
+                        .movie(movies[1])
+                        .theater(theater)
+                        .startDateTime(LocalDateTime.now().plusHours(4))
+                        .endDateTime(LocalDateTime.now().plusHours(6))
+                        .ticketPurchaseOpeningDateTime(LocalDateTime.now())
+                        .ticketPurchaseClosingDateTime(LocalDateTime.now().plusHours(3).plusMinutes(59))
+                        .movieType(MovieType.MAX)
+                        .isCancelled(false)
+                        .build()
         );
     }
 

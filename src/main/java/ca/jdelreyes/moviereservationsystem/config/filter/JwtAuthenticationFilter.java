@@ -6,7 +6,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,17 +30,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        final String authenticationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        final String BEARER = "Bearer ";
+        final String COOKIE_HEADER = request.getHeader(HttpHeaders.COOKIE);
+        final String TOKEN = "token=";
         final String username;
         final String jwt;
 
-        if (authenticationHeader == null || !authenticationHeader.startsWith(BEARER)) {
+        if (COOKIE_HEADER == null || !COOKIE_HEADER.startsWith(TOKEN)) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authenticationHeader.substring(BEARER.length());
+        jwt = COOKIE_HEADER.substring(TOKEN.length());
         username = jwtService.extractUsername(jwt);
 
 //        check if user is already authenticated

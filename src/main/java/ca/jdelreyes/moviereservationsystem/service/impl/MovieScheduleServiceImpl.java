@@ -20,9 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-// todo:
-//  need to implement movie schedule filters based on parameters such as theater, date
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -96,10 +93,9 @@ public class MovieScheduleServiceImpl implements MovieScheduleService {
     @Override
     public List<MovieScheduleResponse> getTheaterMovieSchedules(Long theaterId) throws NotFoundException {
         Theater theater = theaterRepository.findById(theaterId).orElseThrow(NotFoundException::new);
-        List<MovieSchedule> movieScheduleList = movieScheduleRepository.findAllByTheater(theater);
+        List<MovieSchedule> movieScheduleList = movieScheduleRepository.findAvailableSchedulesForTheater(theater);
 
-        return movieScheduleList
-                .stream()
+        return movieScheduleList.stream()
                 .map(movieSchedule ->
                         Mapper.mapMovieScheduleToMovieScheduleResponse(
                                 movieSchedule, movieImageRepository.findByMovie(movieSchedule.getMovie())
@@ -108,8 +104,40 @@ public class MovieScheduleServiceImpl implements MovieScheduleService {
     }
 
     @Override
-    public List<MovieScheduleResponse> getMovieMovieSchedules(Movie movie) throws NotFoundException {
-        return List.of();
+    public List<MovieScheduleResponse> getMovieMovieSchedules(Long movieId) throws NotFoundException {
+        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
+        List<MovieSchedule> movieScheduleList = movieScheduleRepository.findAvailableSchedulesForMovie(movie);
+
+        return movieScheduleList.stream()
+                .map(movieSchedule ->
+                        Mapper.mapMovieScheduleToMovieScheduleResponse(
+                                movieSchedule, movieImageRepository.findByMovie(movieSchedule.getMovie())
+                        ))
+                .toList();
+    }
+
+    @Override
+    public List<MovieScheduleResponse> getTheaterAndMovieMovieSchedules(Long theaterId, Long movieId) throws NotFoundException {
+        Theater theater = theaterRepository.findById(theaterId).orElseThrow(NotFoundException::new);
+        Movie movie = movieRepository.findById(movieId).orElseThrow(NotFoundException::new);
+        List<MovieSchedule> movieScheduleList = movieScheduleRepository.findAvailableSchedulesForMovieAndTheater(movie, theater);
+
+        return movieScheduleList.stream()
+                .map(movieSchedule ->
+                        Mapper.mapMovieScheduleToMovieScheduleResponse(
+                                movieSchedule, movieImageRepository.findByMovie(movieSchedule.getMovie())
+                        ))
+                .toList();
+    }
+
+    @Override
+    public List<MovieScheduleResponse> getAvailableMovieSchedules() {
+        return movieScheduleRepository.findAvailableMovieSchedules()
+                .stream().map(movieSchedule ->
+                        Mapper.mapMovieScheduleToMovieScheduleResponse(
+                                movieSchedule, movieImageRepository.findByMovie(movieSchedule.getMovie())
+                        ))
+                .toList();
     }
 
     @Override
