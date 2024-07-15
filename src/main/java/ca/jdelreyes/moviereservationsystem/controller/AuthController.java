@@ -3,16 +3,19 @@ package ca.jdelreyes.moviereservationsystem.controller;
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.service.impl.AuthServiceImpl;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -24,17 +27,16 @@ public class AuthController {
     public ResponseEntity<?> authenticate(
             @Valid @RequestBody AuthRequest authRequest, HttpServletResponse response
     ) throws NotFoundException {
-        final int ONE_DAY = 60 * 60 * 24;
-
         String token = authService.authenticate(authRequest);
 
-        Cookie cookie = new Cookie("token", token);
+        ResponseCookie cookie = ResponseCookie.from("token", token)
+                .maxAge(Duration.ofDays(1))
+                .path("/")
+                .httpOnly(true)
+                .sameSite("LAX")
+                .build();
 
-        cookie.setMaxAge(ONE_DAY);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
-        response.addCookie(cookie);
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return ResponseEntity.status(HttpStatus.OK).build();
     }

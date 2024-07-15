@@ -1,6 +1,7 @@
+### properties ###
 src/main/resources/application.properties
 src/main/resources/application-docker.properties
-todo.md
+src/test/resources/application.properties
 
 HELP.md
 .gradle
