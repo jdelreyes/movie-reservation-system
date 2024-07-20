@@ -147,8 +147,6 @@ public class TheaterClientTests {
 
     @Test
     public void CreateTheaterShouldReturnTheaterDetailsResponseAndHttpHeaderLocationAnd201HttpStatusCode() {
-        System.out.println(headers);
-
         ResponseEntity<TheaterDetailsResponse> theaterDetailsResponseResponseEntity = restTemplate.exchange(
                 "/api/theaters",
                 HttpMethod.POST,

@@ -1,12 +1,12 @@
 package ca.jdelreyes.moviereservationsystem.config.filter;
 
 import ca.jdelreyes.moviereservationsystem.service.impl.JwtServiceImpl;
+import ca.jdelreyes.moviereservationsystem.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
-        final String COOKIE_HEADER = request.getHeader(HttpHeaders.COOKIE);
+        final String COOKIE_HEADER = CookieUtil.getCookie("token", request);
         final String TOKEN = "token=";
         final String username;
         final String jwt;

@@ -31,7 +31,7 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         final Date NOW = new Date(System.currentTimeMillis());
-        final Date ONE_DAY = new Date(System.currentTimeMillis() + 1000 * 60 * 24);
+        final Date ONE_DAY = new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24);
 
         return Jwts
                 .builder()

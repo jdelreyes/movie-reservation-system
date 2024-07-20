@@ -43,6 +43,14 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
+    public List<MovieResponse> getAvailableMoviesByTitleContaining(String title, Pageable pageable) {
+        return movieRepository.findAvailableMoviesByTitleContaining(title, pageable)
+                .stream()
+                .map(movie -> Mapper.mapMovieToMovieResponse(movie, movieImageRepository.findByMovie(movie)))
+                .toList();
+    }
+
+    @Override
     public MovieImageResponse getMovieImage(Long movieId) throws NotFoundException {
         MovieImage movieImage = movieImageRepository
                 .findById(movieId)

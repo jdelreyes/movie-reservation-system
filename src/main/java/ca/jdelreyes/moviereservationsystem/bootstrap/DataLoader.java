@@ -53,8 +53,8 @@ public class DataLoader implements CommandLineRunner {
         // theater
         if (!theaterRepository.existsById(1L)) {
             theater = Theater.builder()
-                    .name("Theater")
-                    .location("123 Street")
+                    .name("Maple Leaf Theater")
+                    .location("123 Queen Street West, Toronto, ON M5H 2M9, Canada")
                     .build();
 
             theater = theaterRepository.save(theater);

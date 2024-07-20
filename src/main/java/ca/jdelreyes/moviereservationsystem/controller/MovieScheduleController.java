@@ -11,6 +11,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,17 +26,39 @@ public class MovieScheduleController {
     @GetMapping
     public ResponseEntity<List<MovieScheduleResponse>> getMovieSchedules(
             @RequestParam(name = "theater") Optional<Long> theaterId,
-            @RequestParam(name = "movie") Optional<Long> movieId
+            @RequestParam(name = "movie") Optional<Long> movieId,
+            @RequestParam(name = "date") Optional<Instant> instant
     ) throws NotFoundException {
-        if (theaterId.isPresent() && movieId.isPresent())
-            return ResponseEntity.ok(movieScheduleService.getTheaterAndMovieMovieSchedules(theaterId.get(), movieId.get()));
-        if (theaterId.isPresent())
-            return ResponseEntity.ok(movieScheduleService.getTheaterMovieSchedules(theaterId.get()));
-        if (movieId.isPresent())
-            return ResponseEntity.ok(movieScheduleService.getMovieMovieSchedules(movieId.get()));
+        List<MovieScheduleResponse> schedules;
 
-        return ResponseEntity.ok(movieScheduleService.getAvailableMovieSchedules());
+        if (theaterId.isPresent() && movieId.isPresent() && instant.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByTheaterAndMovieAndLocalDateTime(
+                    theaterId.get(),
+                    movieId.get(),
+                    LocalDateTime.ofInstant(instant.get(), ZoneId.of("America/Toronto")));
+        } else if (theaterId.isPresent() && instant.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByTheaterAndLocalDateTime(theaterId.get(),
+                    LocalDateTime.ofInstant(instant.get(), ZoneId.of("America/Toronto")));
+        } else if (movieId.isPresent() && instant.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByMovieAndLocalDateTime(movieId.get(),
+                    LocalDateTime.ofInstant(instant.get(), ZoneId.of("America/Toronto")));
+        } else if (theaterId.isPresent() && movieId.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByTheaterAndMovie(theaterId.get(), movieId.get());
+        } else if (theaterId.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByTheater(theaterId.get());
+        } else if (movieId.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByMovie(movieId.get());
+        } else if (instant.isPresent()) {
+            schedules = movieScheduleService.getAvailableMovieSchedulesByLocalDateTime(
+                    LocalDateTime.ofInstant(instant.get(), ZoneId.of("America/Toronto"))
+            );
+        } else {
+            schedules = movieScheduleService.getAvailableMovieSchedules();
+        }
+
+        return ResponseEntity.ok(schedules);
     }
+
 
     @PostMapping
     public ResponseEntity<MovieScheduleResponse> airMovie(

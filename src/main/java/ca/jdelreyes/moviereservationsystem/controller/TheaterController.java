@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/theaters")
@@ -28,7 +29,11 @@ public class TheaterController {
     private final TheaterServiceImpl theaterService;
 
     @GetMapping
-    public ResponseEntity<List<TheaterResponse>> getTheaters(Pageable pageable) {
+    public ResponseEntity<List<TheaterResponse>> getTheaters(Pageable pageable,
+                                                             @RequestParam(name = "name") Optional<String> theaterName) {
+        if (theaterName.isPresent())
+            return ResponseEntity.ok(theaterService.getTheatersByNameContaining(theaterName.get()));
+
         final String NAME_FIELD = "name";
 
         return ResponseEntity.ok(theaterService.getTheaters(PageRequest.of(

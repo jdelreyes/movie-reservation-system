@@ -74,7 +74,6 @@ public class MovieClientTests {
         assertThat(listResponseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(listResponseEntity.getBody()).isNotNull();
         assertThat(listResponseEntity.getBody().size()).isEqualTo(movieCount);
-        System.out.println(listResponseEntity.getBody());
     }
 
     @Test

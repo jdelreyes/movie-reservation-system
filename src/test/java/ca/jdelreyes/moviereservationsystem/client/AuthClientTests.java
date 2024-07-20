@@ -1,7 +1,6 @@
 package ca.jdelreyes.moviereservationsystem.client;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
-import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
 import ca.jdelreyes.moviereservationsystem.service.impl.JwtServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,11 +44,11 @@ public class AuthClientTests {
         registerUser();
         AuthRequest wrongAuthenticateCredentials = new AuthRequest("wrongUsername", "wrongPassword");
 
-        ResponseEntity<AuthResponse> authResponseResponseEntity =
+        ResponseEntity<Void> authResponseResponseEntity =
                 restTemplate
                         .postForEntity("/api/auth/authenticate",
                                 wrongAuthenticateCredentials,
-                                AuthResponse.class);
+                                Void.class);
 
         assertThat(authResponseResponseEntity.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }

@@ -1,8 +1,5 @@
 package ca.jdelreyes.moviereservationsystem.service.impl;
 
-import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieScheduleRequest;
-import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
-import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
@@ -11,16 +8,13 @@ import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.UpdateTheaterRequest;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
-import ca.jdelreyes.moviereservationsystem.util.Mapper;
-import ca.jdelreyes.moviereservationsystem.model.Movie;
-import ca.jdelreyes.moviereservationsystem.model.MovieSchedule;
 import ca.jdelreyes.moviereservationsystem.model.Seat;
 import ca.jdelreyes.moviereservationsystem.model.Theater;
-import ca.jdelreyes.moviereservationsystem.repository.MovieRepository;
 import ca.jdelreyes.moviereservationsystem.repository.MovieScheduleRepository;
 import ca.jdelreyes.moviereservationsystem.repository.SeatRepository;
 import ca.jdelreyes.moviereservationsystem.repository.TheaterRepository;
 import ca.jdelreyes.moviereservationsystem.service.TheaterService;
+import ca.jdelreyes.moviereservationsystem.util.Mapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -38,6 +32,11 @@ public class TheaterServiceImpl implements TheaterService {
     @Override
     public List<TheaterResponse> getTheaters(PageRequest pageRequest) {
         return theaterRepository.findAll(pageRequest).stream().map(Mapper::mapTheaterToTheaterResponse).toList();
+    }
+
+    @Override
+    public List<TheaterResponse> getTheatersByNameContaining(String theaterName) {
+        return theaterRepository.findByNameContaining(theaterName).stream().map(Mapper::mapTheaterToTheaterResponse).toList();
     }
 
     @Override

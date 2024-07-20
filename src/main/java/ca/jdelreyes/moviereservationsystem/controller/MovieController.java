@@ -20,6 +20,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/movies")
@@ -28,14 +29,20 @@ public class MovieController {
     private final MovieServiceImpl movieService;
 
     @GetMapping
-    public ResponseEntity<List<MovieResponse>> getAvailableMovies(Pageable pageable) {
-        final String TITLE_FILED = "m.title";
+    public ResponseEntity<List<MovieResponse>> getAvailableMovies(
+            Pageable pageable, @RequestParam("title") Optional<String> movieTitle
+    ) {
+        final String TITLE_FIELD = "m.title";
 
-        return ResponseEntity.ok(movieService.getAvailableMovies(PageRequest.of(
+        PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
-                pageable.getSortOr(Sort.by(Sort.Direction.ASC, TITLE_FILED))
-        )));
+                pageable.getSortOr(Sort.by(Sort.Direction.ASC, TITLE_FIELD))
+        );
+
+        if (movieTitle.isPresent())
+            return ResponseEntity.ok(movieService.getAvailableMoviesByTitleContaining(movieTitle.get(), pageRequest));
+        return ResponseEntity.ok(movieService.getAvailableMovies(pageRequest));
     }
 
     @GetMapping("/{id}/image")

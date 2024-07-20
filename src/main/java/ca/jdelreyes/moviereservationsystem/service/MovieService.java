@@ -15,6 +15,8 @@ import java.util.List;
 public interface MovieService {
     List<MovieResponse> getAvailableMovies(Pageable pageable);
 
+    List<MovieResponse> getAvailableMoviesByTitleContaining(String title, Pageable pageable);
+
     MovieImageResponse getMovieImage(Long movieId) throws NotFoundException;
 
     MovieResponse getMovie(Long id) throws NotFoundException;

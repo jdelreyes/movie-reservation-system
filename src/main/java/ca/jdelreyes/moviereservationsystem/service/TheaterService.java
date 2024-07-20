@@ -1,8 +1,5 @@
 package ca.jdelreyes.moviereservationsystem.service;
 
-import ca.jdelreyes.moviereservationsystem.dto.movieschedule.CreateMovieScheduleRequest;
-import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleResponse;
-import ca.jdelreyes.moviereservationsystem.dto.movieschedule.RescheduleMovieRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
@@ -18,7 +15,10 @@ import java.util.List;
 public interface TheaterService {
     List<TheaterResponse> getTheaters(PageRequest pageRequest);
 
+    List<TheaterResponse> getTheatersByNameContaining(String theaterName);
+
     TheaterDetailsResponse getTheater(Long id) throws NotFoundException;
+
 
     TheaterResponse createTheater(CreateTheaterRequest createTheaterRequest);
 

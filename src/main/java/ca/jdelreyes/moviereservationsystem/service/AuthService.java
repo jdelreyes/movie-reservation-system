@@ -7,4 +7,6 @@ public interface AuthService {
     String authenticate(AuthRequest authRequest) throws NotFoundException;
 
     void register(AuthRequest authRequest);
+
+    void logout();
 }
