@@ -1,6 +1,8 @@
 package ca.jdelreyes.moviereservationsystem.controller;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
+import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.exception.ConflictException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.service.impl.AuthServiceImpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,8 +14,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Duration;
-
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -21,29 +21,12 @@ public class AuthController {
     private final AuthServiceImpl authService;
 
     @PostMapping("/authenticate")
-    public ResponseEntity<?> authenticate(
+    public ResponseEntity<AuthResponse> authenticate(
             @Valid @RequestBody AuthRequest authRequest, HttpServletResponse response
-    ) throws NotFoundException {
-        String token = authService.authenticate(authRequest);
+    ) throws NotFoundException, ConflictException {
+        AuthResponse authResponse = authService.authenticate(authRequest, response);
 
-        ResponseCookie cookieToken = ResponseCookie.from("token", token)
-                .maxAge(Duration.ofDays(1))
-                .path("/")
-                .httpOnly(true)
-                .sameSite("LAX")
-                .build();
-
-        ResponseCookie usernameCookie = ResponseCookie.from("username", authRequest.username())
-                .maxAge(Duration.ofDays(1))
-                .path("/")
-                .httpOnly(false)
-                .sameSite("LAX")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookieToken.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, usernameCookie.toString());
-
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).body(authResponse);
     }
 
     @PostMapping("/register")
@@ -56,7 +39,7 @@ public class AuthController {
     @PutMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletResponse response) {
         ResponseCookie cookie = ResponseCookie.from("token", "")
-                .maxAge(Duration.ofSeconds(-1))
+                .maxAge(0)
                 .path("/")
                 .build();
 

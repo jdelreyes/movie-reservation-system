@@ -11,8 +11,8 @@ public record MovieScheduleResponse(Long id,
                                     LocalDateTime endDateTime,
                                     LocalDateTime ticketPurchaseOpeningDateTime,
                                     LocalDateTime ticketPurchaseClosingDateTime,
-                                    MovieResponse movieResponse,
-                                    TheaterResponse theaterResponse,
+                                    MovieResponse movie,
+                                    TheaterResponse theater,
                                     MovieType movieType,
                                     Boolean isCancelled) {
 }

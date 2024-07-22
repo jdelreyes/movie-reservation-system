@@ -1,18 +1,23 @@
 package ca.jdelreyes.moviereservationsystem.service.impl;
 
 import ca.jdelreyes.moviereservationsystem.dto.auth.AuthRequest;
+import ca.jdelreyes.moviereservationsystem.dto.auth.AuthResponse;
+import ca.jdelreyes.moviereservationsystem.exception.ConflictException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.model.User;
 import ca.jdelreyes.moviereservationsystem.model.enums.Role;
 import ca.jdelreyes.moviereservationsystem.repository.UserRepository;
 import ca.jdelreyes.moviereservationsystem.service.AuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
+import java.time.Duration;
 import java.util.Set;
 
 @Service
@@ -23,17 +28,26 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public String authenticate(AuthRequest authRequest) throws NotFoundException {
+    public AuthResponse authenticate(AuthRequest authRequest, HttpServletResponse response) throws NotFoundException, ConflictException {
         User user = userRepository
                 .findByUsername(authRequest.username())
                 .orElseThrow(NotFoundException::new);
 
         if (!passwordMatches(authRequest.password(), user.getPassword()))
-            throw new NotFoundException();
+            throw new ConflictException();
 
-        return jwtService.generateToken(new HashMap<>() {{
-            put("roles", user.getRoles());
-        }}, user);
+        String token = jwtService.generateToken(user);
+
+        ResponseCookie cookieToken = ResponseCookie.from("token", token)
+                .maxAge(Duration.ofDays(1))
+                .path("/")
+                .httpOnly(true)
+                .sameSite("LAX")
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookieToken.toString());
+
+        return new AuthResponse(user.getUsername(), user.getRoles());
     }
 
     @Override

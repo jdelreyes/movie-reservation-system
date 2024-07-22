@@ -41,6 +41,5 @@ public interface MovieScheduleService {
 
     List<MovieScheduleResponse> getAvailableMovieSchedules();
 
-
     MovieScheduleResponse getMovieSchedule(Long id) throws NotFoundException;
 }
