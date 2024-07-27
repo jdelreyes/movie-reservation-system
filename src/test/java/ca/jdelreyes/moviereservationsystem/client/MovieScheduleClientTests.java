@@ -91,6 +91,20 @@ public class MovieScheduleClientTests {
     }
 
     @Test
+    public void GetMovieScheduleShouldReturnMovieScheduleResponseAnd200HttpStatusCode() {
+        ResponseEntity<MovieScheduleResponse> response = restTemplate.exchange(
+                movieScheduleUri + "/" + 1,
+                HttpMethod.GET,
+                null,
+                MovieScheduleResponse.class
+        );
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().movieType()).isEqualTo(MovieType.REGULAR);
+    }
+
+    @Test
     public void AirMovieShouldReturnMovieScheduleResponseAnd201HttpStatusCode() {
         CreateMovieScheduleRequest createMovieScheduleRequest = createMovieScheduleRequest();
 

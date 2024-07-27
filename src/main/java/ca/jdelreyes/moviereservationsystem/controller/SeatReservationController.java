@@ -6,6 +6,9 @@ import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
 import ca.jdelreyes.moviereservationsystem.model.User;
 import ca.jdelreyes.moviereservationsystem.service.impl.SeatReservationServiceImpl;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +43,18 @@ public class SeatReservationController {
     public ResponseEntity<TicketResponse> buyTicket(
             @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateTicketRequest createTicketRequest
-    ) throws NotFoundException {
+    ) throws NotFoundException, StripeException {
+        // todo: this probably needs to be in a separate endpoint after user has submitted which movie they want
+        // todo: understand payment intent
+        PaymentIntentCreateParams createdPaymentIntent = PaymentIntentCreateParams.builder()
+                .setAmount(1L)
+                .setCurrency("cad")
+                .setSetupFutureUsage(PaymentIntentCreateParams.SetupFutureUsage.OFF_SESSION)
+                .build();
+
+        PaymentIntent paymentIntent = PaymentIntent.create(createdPaymentIntent);
+        // todo end
+
         TicketResponse ticketResponse = seatReservationService.buyTicket(user, createTicketRequest);
 
         return ResponseEntity

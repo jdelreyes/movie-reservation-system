@@ -14,13 +14,14 @@ public class WebConfiguration {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:4200")
+                        .allowedOrigins("http://localhost:4200", "http://movie-reservation-angular:4200")
                         .allowedMethods(
                                 HttpMethod.GET.name(),
                                 HttpMethod.POST.name(),
                                 HttpMethod.PUT.name(),
                                 HttpMethod.DELETE.name(),
-                                HttpMethod.OPTIONS.name()
+                                HttpMethod.OPTIONS.name(),
+                                HttpMethod.PATCH.name()
                         )
                         .allowCredentials(true)
                         .allowedHeaders("*")

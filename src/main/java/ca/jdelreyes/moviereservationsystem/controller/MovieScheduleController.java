@@ -59,6 +59,11 @@ public class MovieScheduleController {
         return ResponseEntity.ok(schedules);
     }
 
+    @GetMapping("{id}")
+    public ResponseEntity<MovieScheduleResponse> getMovieSchedule(@PathVariable("id") Long id) throws NotFoundException {
+        return ResponseEntity.ok(movieScheduleService.getMovieSchedule(id));
+    }
+
 
     @PostMapping
     public ResponseEntity<MovieScheduleResponse> airMovie(

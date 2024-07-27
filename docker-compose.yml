@@ -16,7 +16,7 @@ services:
 
   postgresql-movie-reservation-system:
     container_name: postgresql-movie-reservation-system
-    image: postgres:16-alpine
+    image: postgres:16
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password
