@@ -24,7 +24,7 @@ public class StripeController {
 
     @PostMapping("/create-payment-intent")
     public ResponseEntity<PaymentIntentResponse> createTicketPaymentIntent(
-//            @AuthenticationPrincipal User user,
+            @AuthenticationPrincipal User user,
             @Valid @RequestBody CreateTicketPaymentIntentRequest createTicketPaymentIntentRequest
     ) throws StripeException {
         User user = User.builder().build();
