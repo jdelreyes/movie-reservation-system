@@ -4,6 +4,7 @@ import ca.jdelreyes.moviereservationsystem.exception.BadRequestException;
 import ca.jdelreyes.moviereservationsystem.exception.ConflictException;
 import ca.jdelreyes.moviereservationsystem.exception.ForbiddenException;
 import ca.jdelreyes.moviereservationsystem.exception.NotFoundException;
+import com.stripe.exception.StripeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -63,5 +64,15 @@ public class ApplicationExceptionHandler {
         Map<String, Object> errorMap = new HashMap<>();
         errorMap.put("message", methodArgumentNotValidException.getBody().getDetail());
         return errorMap;
+    }
+
+    @ExceptionHandler(StripeException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, Object> handleStripeException(StripeException stripeException) {
+        Map<String, Object> errorData = new HashMap<>();
+        errorData.put("message", stripeException.getMessage());
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("error", errorData);
+        return responseData;
     }
 }

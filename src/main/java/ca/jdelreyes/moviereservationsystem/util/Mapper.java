@@ -6,11 +6,13 @@ import ca.jdelreyes.moviereservationsystem.dto.movieschedule.MovieScheduleRespon
 import ca.jdelreyes.moviereservationsystem.dto.seat.CreateSeatRequest;
 import ca.jdelreyes.moviereservationsystem.dto.seat.SeatResponse;
 import ca.jdelreyes.moviereservationsystem.dto.seat.UpdateSeatRequest;
+import ca.jdelreyes.moviereservationsystem.dto.stripe.PaymentIntentResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterDetailsResponse;
 import ca.jdelreyes.moviereservationsystem.dto.theater.TheaterResponse;
 import ca.jdelreyes.moviereservationsystem.dto.ticket.TicketResponse;
 import ca.jdelreyes.moviereservationsystem.dto.user.UserResponse;
 import ca.jdelreyes.moviereservationsystem.model.*;
+import com.stripe.model.PaymentIntent;
 
 import java.util.List;
 
@@ -115,5 +117,11 @@ public class Mapper {
                 movieImage.getCreatedAt(),
                 ImageUtil.decompressImage(movieImage.getData()))
                 : null;
+    }
+
+    public static PaymentIntentResponse mapPaymentIntentToPaymentIntentResponse(PaymentIntent paymentIntent) {
+        return new PaymentIntentResponse(
+                paymentIntent.getClientSecret()
+        );
     }
 }
